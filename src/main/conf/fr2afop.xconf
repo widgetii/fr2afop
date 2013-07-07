@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- 
+	Configuration file of FreeReport to Apache FOP Converter
+	NOTE: This is the version of the configuration 
+-->
+<fr2afop version="${project.version}">	
+	<!-- 
+		====================
+		XSL Replacement File
+		====================		
+		This file is used every time a report is saved in XML format in order to transform
+		the final XML output and to make changes in the report itself.
+		The file is optional - you can comment the line below, thus XSL transformation will
+		be omitted.
+	-->
+	<ReplacementFile>replace.xsl</ReplacementFile>
+	
+	<!-- 
+		=========
+		Databases
+		=========
+		The list of databases, which will be used for data fetching, while a report is being
+		converted or rendered. Free Report framework has used Delphi datasources for this purpose,
+		but we don't have access to them, because such datasources are defined in Delphi application
+		itself, but not in the report files.
+	-->
+	<Databases>
+		<!-- 
+			Firebird example database. 
+			It's used in 'sample.frf' report just for demonstration of converter features.
+			In this example we use Firebird version 1.5. If you have the newest version of Firebird
+			or have installed it in different folder, change path to the database file.
+		-->		
+		<Database Name="Firebird Example Database">
+			<!--
+				A connection to a database is being established using a JDBC driver. The driver must be 
+				accessible from application classpath. You can add any JDBC compatible java driver as .jar 
+				archive to /lib/ folder.
+			-->
+			<Connection>
+				<Driver>org.firebirdsql.jdbc.FBDriver</Driver>
+				<URL>jdbc:firebirdsql://localhost:3050/c:/Program Files (x86)/Firebird/Firebird_1_5/examples/EMPLOYEE.FDB</URL>
+				<UserName>sysdba</UserName>
+				<Password>masterkey</Password>				
+			</Connection>
+		</Database>
+		
+		<!--
+			PartPost database.
+			It's used for other samples in this project. These samples are Free Report files for
+			the application of Russian Post service.
+		-->
+		<Database Name="PartPost Database">
+			<Connection>
+				<Driver>org.firebirdsql.jdbc.FBDriver</Driver>
+				<URL>jdbc:firebirdsql://localhost:3050/c:/PartPost114/data/PARTPOST.IB</URL>
+				<UserName>sysdba</UserName>
+				<Password>masterkey</Password>				
+			</Connection>
+		</Database>	
+	</Databases>
+	
+	<!-- 
+		========
+		Datasets
+		========
+		Datasets have the same meaning as databases. There can be many datasets related to one database. 
+		So, in databases we just define the connection parameters, while in dataset we define the query 
+		itself. Dataset is being identified by name. This name should match to the name defined in report 
+		file. The dataset name may have any number of synonyms. It doesn't matter how dataset will be 
+		identified: by name or by one of its synonyms. Dataset may have any number of parameters, these 
+		parameters will be substituted in dataset query before the query will be performed.
+	-->
+	<Datasets>		
+		<!-- 
+			List of employees for 'sample.frf' report. 
+		-->
+		<Dataset Name="EmployeesDataSet" Database="Firebird Example Database">
+			<Query><![CDATA[
+				SELECT * FROM EMPLOYEE
+			]]>
+			</Query>			
+		</Dataset>
+		
+		<!-- 
+			List of firms for all reports related to PartPost application.	
+		-->
+		<Dataset Name="pre_rep.IBTable1" Database="PartPost Database">
+			<Query><![CDATA[
+				select * from FIRMS; 
+			]]>
+			</Query>			
+		</Dataset>
+		
+		<!-- 
+			List of parcels for 'Form 113' report. 
+		-->
+		<Dataset Name="frDBDataSet1" Database="PartPost Database">
+			<Synonyms>
+				<Synonym>IBQuery3</Synonym>
+				<Synonym>pre_rep.IBQuery2</Synonym>
+			</Synonyms>
+			<Parameters>
+				<Parameter Name="list_num">1</Parameter>
+				<Parameter Name="list_date">11.03.2012</Parameter>
+				<Parameter Name="post_num">14</Parameter>
+			</Parameters>
+			<Query><![CDATA[
+				select * from FORM_103 f103
+				left join MAILOTMETKI mo on mo.BARCODE = f103.BARCODE
+				where 
+					f103.NSPI = ${list_num} and
+					f103.DAPO = '${list_date}' and
+					f103.NPP = ${post_num}; 
+			]]>
+			</Query>			
+		</Dataset>
+		
+		<!-- 
+			List of parcels for 'Form 103' report. 
+		-->
+		<Dataset Name="frDBDataSet3" Database="PartPost Database">
+			<Synonyms>
+				<Synonym>IBQuery1</Synonym>
+				<Synonym>brzagf.IBDataSet1</Synonym>
+			</Synonyms>
+			<Parameters>
+				<Parameter Name="company_num">7726664036</Parameter>
+				<Parameter Name="list_num">1</Parameter>
+				<Parameter Name="list_date">11.03.2012</Parameter>
+			</Parameters>
+			<Query><![CDATA[
+				select 
+					f103.*,
+					cnt.COMMENT as COMMENT77,
+					(MASSRATE + AIRRATE) as PERESULKASNDS,
+					(INSRRATE + MASSRATE + AIRRATE) as ITOGOZAPERESULKU,
+					(select UVEDRATE_VAL from CALC_UVED_RATE(f103.DAPO, f103.NSPI, f103.INN)) as UVEDRATE_VAL
+				from FORM_103 f103
+				left join CONTENTS cnt on 
+					cnt.NSPI = f103.NSPI and 
+					cnt.DAPO = f103.DAPO and 
+					cnt.INN = f103.INN and 
+					cnt.NPP = f103.NPP
+				where 
+					f103.NSPI = ${list_num} and
+					f103.DAPO = '${list_date}' and
+					f103.INN = '${company_num}'
+				order by f103.NPP; 
+			]]>
+			</Query>			
+		</Dataset>
+		
+		<!-- 
+			'Form 103' header. 
+		-->
+		<Dataset Name="frDBDataSet3_Ext" Database="PartPost Database">
+			<Synonyms>
+				<Synonym>IBQuery103</Synonym>
+			</Synonyms>
+			<Parameters>
+				<Parameter Name="company_pps">&#1052;&#1052;&#1055; &#8470;7 &#1055;&#1054;&#1063;&#1058;&#1040; &#1056;&#1054;&#1057;&#1057;&#1048;&#1048; &#1052;&#1054;&#1057;&#1050;&#1042;&#1040; 115127</Parameter>
+				<Parameter Name="company_num">7726664036</Parameter>
+				<Parameter Name="list_num">1</Parameter>
+				<Parameter Name="list_date">11.03.2012</Parameter>
+			</Parameters>
+			<Query><![CDATA[
+				select 
+					f.FIRM_NAME as OTPRAVITEL,
+					case 
+						when f.ZIP_ADR1 is NULL then f.ZIP_ADR2
+						else f.ZIP_ADR1
+					end as INDEXFROM,
+					'${company_pps}' as PPS,
+					artt.ARTTYPENAME as TYPE_OTPRAVL,
+					artk.KATEGNAME as KATEG_OTPRAVL,
+					mr.NAME as RAZR_OTPR,
+					(select STRPOSTMARKS from GET_2MARKNAME(spk.POSTMARK)) as MARKS
+				from SPISKI spk
+				left join FIRMS f on f.INN = spk.INN
+				left join arttype artt on artt.ARTTYPEID = spk.ARTTYPEID
+				left join artkateg artk on artk.KATEGID = spk.KATEGID
+				left join mailrank mr on mr.ID = spk.MAILRANK
+				where 
+					spk.NSPI = ${list_num} and
+					spk.DAPO = '${list_date}' and
+					spk.INN = '${company_num}';
+			]]>
+			</Query>			
+		</Dataset>
+		
+		<!-- 
+			List of parcels for 'Form 16' report. 
+		-->
+		<Dataset Name="f_16" Database="PartPost Database">
+			<Synonyms>
+				<Synonym>IBQueryF16</Synonym>
+			</Synonyms>
+			<Parameters>
+				<Parameter Name="company_num">7726664036</Parameter>
+				<Parameter Name="list_date">11.03.2012</Parameter>
+				<Parameter Name="list_num">1</Parameter>
+			</Parameters>
+			<Query><![CDATA[
+				select 	
+					f103.NPP as NPP_1,
+					artt.ARTTYPENAME as TYPE_OTPRAVL_1,		
+					f103.BARCODE as BARCODE_1,
+					f103.VALUE_ as VALUE_1,					
+					cnt.COMMENT as POSTMARK_1,
+					f103_2.NPP as NPP_2,
+					case
+						when f103_2.NPP is null then null
+						else artt.ARTTYPENAME
+					end as TYPE_OTPRAVL_2,	
+					f103_2.BARCODE as BARCODE_2,
+					f103_2.VALUE_ as VALUE_2,
+					cnt_2.COMMENT as POSTMARK_2
+				from FORM_103 f103
+				left join FORM_103 f103_2 on
+					f103_2.INN = f103.INN and
+					f103_2.DAPO = f103.DAPO and    
+					f103_2.NSPI = f103.NSPI and
+					f103_2.NPP = f103.NPP + 1 
+				join SPISKI spk on 
+					spk.NSPI = f103.NSPI and 
+					spk.DAPO = f103.DAPO and 
+					spk.INN = f103.INN
+				left join arttype artt on artt.ARTTYPEID = spk.ARTTYPEID
+				left join CONTENTS cnt on 
+					cnt.NSPI = f103.NSPI and 
+					cnt.DAPO = f103.DAPO and 
+					cnt.INN = f103.INN and 
+					cnt.NPP = f103.NPP
+				left join CONTENTS cnt_2 on 
+					cnt_2.NSPI = f103_2.NSPI and 
+					cnt_2.DAPO = f103_2.DAPO and 
+					cnt_2.INN = f103_2.INN and 
+					cnt_2.NPP = f103_2.NPP
+				where 
+					f103.INN = '${company_num}' and
+					f103.DAPO = '${list_date}' and    
+					f103.NSPI = ${list_num} and
+					MOD(f103.NPP, 2) = 1
+				order by f103.NPP;
+			]]>
+			</Query>			
+		</Dataset>
+		
+		<!-- 
+			'Form 16' header. 
+		-->
+		<Dataset Name="f_16_Ext" Database="PartPost Database">			
+			<Parameters>
+				<Parameter Name="company_pps">&#1052;&#1052;&#1055; &#8470;7 &#1055;&#1054;&#1063;&#1058;&#1040; &#1056;&#1054;&#1057;&#1057;&#1048;&#1048; &#1052;&#1054;&#1057;&#1050;&#1042;&#1040; 115127</Parameter>
+				<Parameter Name="company_num">7726664036</Parameter>
+				<Parameter Name="list_date">11.03.2012</Parameter>
+				<Parameter Name="list_num">1</Parameter>
+			</Parameters>
+			<Query><![CDATA[
+				select 
+					f.FIRM_NAME as OTPRAVITEL,
+					'${company_pps}' as PPS,
+					spk.DAPO as DATA_REP,
+					artt.ARTTYPENAME as TYPE_OTPRAVL,	
+					artk.KATEGNAME as KATEG_OTPRAVL,
+					(select COUNT(*) from FORM_103 f103 where
+						spk.DAPO = f103.DAPO and
+						spk.INN = f103.INN and
+						spk.NSPI = f103.NSPI) as COUNT_REC
+				from SPISKI spk
+				left join FIRMS f on f.INN = spk.INN
+				left join arttype artt on artt.ARTTYPEID = spk.ARTTYPEID
+				left join artkateg artk on artk.KATEGID = spk.KATEGID
+				where 
+					spk.DAPO = '${list_date}' and
+					spk.INN = '${company_num}' and
+					spk.NSPI = ${list_num};
+			]]>
+			</Query>			
+		</Dataset>
+		
+		<!-- 
+			List of parcels for 'repE1' report. 
+		-->
+		<Dataset Name="frdbs_Ems" Database="PartPost Database">
+			<Synonyms>
+				<Synonym>frdbs_Ems_Detail</Synonym>
+				<Synonym>pre_rep.IBQuery8</Synonym>
+			</Synonyms>
+			<Parameters>
+				<Parameter Name="company_num">7726664036</Parameter>
+				<Parameter Name="list_num">1</Parameter>
+				<Parameter Name="list_date">11.03.2012</Parameter>
+				<Parameter Name="post_num">14</Parameter>
+				<Parameter Name="mainindex">115127</Parameter>
+			</Parameters>
+			<Query><![CDATA[
+				select 
+					f103.*,
+					(INSRRATE + MASSRATE + AIRRATE) as ITOGOZAPERESULKU,
+					${mainindex} as MAININDEX
+				from FORM_103 f103
+				where 
+					f103.NSPI = ${list_num} and
+					f103.DAPO = '${list_date}' and
+					f103.INN = '${company_num}' and
+					f103.NPP =  ${post_num}
+				order by f103.NPP; 
+			]]>
+			</Query>			
+		</Dataset>
+	</Datasets>
+</fr2afop>

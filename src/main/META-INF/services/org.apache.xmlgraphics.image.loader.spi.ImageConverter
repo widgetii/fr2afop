@@ -1,0 +1,8 @@
+org.apache.xmlgraphics.image.loader.impl.ImageConverterBuffered2Rendered
+org.apache.xmlgraphics.image.loader.impl.ImageConverterG2D2Bitmap
+org.apache.xmlgraphics.image.loader.impl.ImageConverterBitmap2G2D
+org.apache.xmlgraphics.image.loader.impl.ImageConverterRendered2PNG
+org.krysalis.barcode4j.image.loader.ImageConverterBarcodeXML2Barcode
+org.krysalis.barcode4j.image.loader.ImageConverterBarcode2G2D
+org.krysalis.barcode4j.image.loader.ImageConverterBarcode2EPS
+org.krysalis.barcode4j.image.loader.ImageConverterBarcode2SVG
