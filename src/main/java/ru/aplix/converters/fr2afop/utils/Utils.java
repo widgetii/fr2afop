@@ -2,9 +2,9 @@ package ru.aplix.converters.fr2afop.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +12,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
+import org.xml.sax.InputSource;
 
 /**
  * Utilities.
@@ -73,12 +75,16 @@ public final class Utils {
 	 *             if any unexpected problem occurs during the unmarshalling
 	 * @throws FileNotFoundException
 	 *             if file not found
+	 * @throws MalformedURLException
+	 *             if a protocol handler for the URL could not be found
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T fileToObject(File file, Class<T> objectClass) throws JAXBException, FileNotFoundException {
+	public static <T> T fileToObject(File file, Class<T> objectClass) throws JAXBException, FileNotFoundException, MalformedURLException {
 		JAXBContext inst = JAXBContext.newInstance(objectClass);
 		Unmarshaller unmarshaller = inst.createUnmarshaller();
-		return (T) unmarshaller.unmarshal(new FileReader(file));
+		@SuppressWarnings("deprecation")
+		String systemId = file.toURL().toString();
+		return (T) unmarshaller.unmarshal(new InputSource(systemId));
 	}
 
 	/**
@@ -89,12 +95,10 @@ public final class Utils {
 	 * @return path
 	 */
 	public static String getJarFolder(Class<?> c) {
-		String name = c.getName().replace('.', '/');
-		String s = c.getResource("/" + name + ".class").toString();
-		s = s.replace('/', File.separatorChar);
-		s = s.substring(0, s.indexOf(".jar") + 4);
-		s = s.substring(s.lastIndexOf(':') - 1);
-		return s.substring(0, s.lastIndexOf(File.separatorChar) + 1);
+		File currentJavaJarFile = new File(c.getProtectionDomain().getCodeSource().getLocation().getPath());
+		String currentJavaJarFilePath = currentJavaJarFile.getAbsolutePath();
+		String currentRootDirectoryPath = currentJavaJarFilePath.replace(currentJavaJarFile.getName(), "");
+		return currentRootDirectoryPath;
 	}
 
 	/**
