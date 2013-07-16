@@ -33,6 +33,7 @@ public class Functions extends AbstractFunctions {
 		{ "(?i)Count[\\s]*\\(", "f:count(" },
 		{ "(?i)Str[\\s]*\\(",   "f:str("  },
 		{ "(?i)Copy[\\s]*\\(",  "f:copy(" },
+		{ "(?i)If[\\s]*\\(", "f:choose(" },
 		{ "(?i)UpperCase[\\s]*\\(", "f:upperCase(" },
 		{ "(?i)LowerCase[\\s]*\\(", "f:lowerCase(" },
 		{ "(?i)NameCase[\\s]*\\(", "f:nameCase(" },
@@ -259,6 +260,12 @@ public class Functions extends AbstractFunctions {
 		} catch (IndexOutOfBoundsException ioobe) {
 			return (String) o;
 		}
+	}
+
+	public String choose(Boolean condition, Object value1, Object value2) {
+		String str1 = value1 != null ? value1.toString() : "";
+		String str2 = value2 != null ? value2.toString() : "";
+		return condition != null && condition ? str1 : str2;
 	}
 
 	public String upperCase(Object o) {

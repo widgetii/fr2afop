@@ -110,7 +110,7 @@ public class FreeReportReader implements ReportReader {
 	}
 
 	@Override
-	public Report readFromStream(InputStreamOpener so, Configuration configuration) throws Exception {
+	public Report readFromStream(InputStreamOpener so, ReportModifier modifier, Configuration configuration) throws Exception {
 		try {
 			this.so = so;
 
@@ -122,7 +122,12 @@ public class FreeReportReader implements ReportReader {
 			readFileVersion();
 			readReport(report);
 
-			buildVariableRelationship(report.getVariables());
+			if (modifier != null) {
+				report = modifier.modify(report);
+			}
+
+			substituteVariables(report);
+			buildVariableRelationship(report);
 			tossViews(report);
 			formDatasets(report, configuration);
 
@@ -211,7 +216,6 @@ public class FreeReportReader implements ReportReader {
 				case 0xFE: // values and variables
 					readVariables(report);
 					readVariableCategories(report);
-					substituteVariables(report);
 					break;
 				case 0xFD: // dataset
 					log.warn("Custom dataset found, skipping...");
@@ -465,7 +469,10 @@ public class FreeReportReader implements ReportReader {
 		return text;
 	}
 
-	protected void buildVariableRelationship(List<Variable> variableList) {
+	protected void buildVariableRelationship(Report report) {
+		// Get list of report variables
+		List<Variable> variableList = report.getVariables();
+
 		// Build variable map
 		Map<String, Variable> variableMap = new HashMap<String, Variable>();
 		variableMap.clear();

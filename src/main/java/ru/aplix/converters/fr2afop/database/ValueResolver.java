@@ -434,6 +434,6 @@ public class ValueResolver {
 	}
 
 	private String prepareExpression(String expression) {
-		return StringUtils.replaceEachRepeatedly(expression, new String[] { "[", "]" }, new String[] { "", "" });
+		return StringUtils.replaceEach(expression, new String[] { "[", "]", "=" }, new String[] { "", "", "==" });
 	}
 }

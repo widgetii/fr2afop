@@ -95,7 +95,7 @@ public class AppTest extends TestCase {
 				}
 				return c.getResourceAsStream(reportResName);
 			}
-		}, new Configuration());
+		}, null, new Configuration());
 
 		File outputDir = new File("target/test-output/").getCanonicalFile();
 		if (!outputDir.exists()) {

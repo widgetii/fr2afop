@@ -53,7 +53,7 @@
 		<Database Name="PartPost Database">
 			<Connection>
 				<Driver>org.firebirdsql.jdbc.FBDriver</Driver>
-				<URL>jdbc:firebirdsql://localhost:3050/c:/PartPost114/data/PARTPOST.IB</URL>
+				<URL>jdbc:firebirdsql://localhost:3050/c:/PartPost117/data/PARTPOST.IB</URL>
 				<UserName>sysdba</UserName>
 				<Password>masterkey</Password>				
 			</Connection>
@@ -135,8 +135,17 @@
 					cnt.COMMENT as COMMENT77,
 					(MASSRATE + AIRRATE) as PERESULKASNDS,
 					(INSRRATE + MASSRATE + AIRRATE) as ITOGOZAPERESULKU,
-					(select UVEDRATE_VAL from CALC_UVED_RATE(f103.DAPO, f103.NSPI, f103.INN)) as UVEDRATE_VAL
+					(select UVEDRATE_VAL from CALC_UVED_RATE(f103.DAPO, f103.NSPI, f103.INN)) as UVEDRATE_VAL,
+					(INSRRATE + MASSRATE + AIRRATE + (select UVEDRATE_VAL from CALC_UVED_RATE(f103.DAPO, f103.NSPI, f103.INN))) as ITOGOKOPLATE,
+					pte.NAME_EX as PAYSUBTYPE,
+					pte.WITHOUTNDS as WITHOUTNDS
 				from FORM_103 f103
+				join SPISKI spk on
+					spk.NSPI = f103.NSPI and
+					spk.DAPO = f103.DAPO and
+					spk.INN = f103.INN
+				left join paytype pt on pt.ID = spk.PAYTYPEID
+				left join PAYTYPE_EX pte on pte.PAYTYPEID = pt.ID and pte.PAYSUBTYPE = spk.PAYSUBTYPE
 				left join CONTENTS cnt on 
 					cnt.NSPI = f103.NSPI and 
 					cnt.DAPO = f103.DAPO and 
@@ -175,12 +184,17 @@
 					artt.ARTTYPENAME as TYPE_OTPRAVL,
 					artk.KATEGNAME as KATEG_OTPRAVL,
 					mr.NAME as RAZR_OTPR,
-					(select STRPOSTMARKS from GET_2MARKNAME(spk.POSTMARK)) as MARKS
+					(select STRPOSTMARKS from GET_2MARKNAME(spk.POSTMARK)) as MARKS,
+					pt.NAME as PAYTYPE,
+                    pte.NAME_EX as PAYSUBTYPE,
+                    pte.WITHOUTNDS as WITHOUTNDS
 				from SPISKI spk
 				left join FIRMS f on f.INN = spk.INN
 				left join arttype artt on artt.ARTTYPEID = spk.ARTTYPEID
 				left join artkateg artk on artk.KATEGID = spk.KATEGID
 				left join mailrank mr on mr.ID = spk.MAILRANK
+				left join paytype pt on pt.ID = spk.PAYTYPEID
+				left join PAYTYPE_EX pte on pte.PAYTYPEID = pt.ID and pte.PAYSUBTYPE = spk.PAYSUBTYPE
 				where 
 					spk.NSPI = ${list_num} and
 					spk.DAPO = '${list_date}' and
