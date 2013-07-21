@@ -28,10 +28,18 @@ public abstract class View {
 	protected float width;
 	@XmlAttribute(name = "Height")
 	protected float height;
-	//@XmlAttribute(name = "Flags")
+	@XmlAttribute(name = "BoundLeft")
+	protected float boundLeft;
+	@XmlAttribute(name = "BoundTop")
+	protected float boundTop;
+	@XmlAttribute(name = "BoundWidth")
+	protected float boundWidth;
+	@XmlAttribute(name = "BoundHeight")
+	protected float boundHeight;
+	// @XmlAttribute(name = "Flags")
 	protected transient int flags;
-	//@XmlAttribute(name = "Stretched")
-	protected transient boolean stretched;
+	@XmlAttribute(name = "Stretched")
+	protected boolean stretched;
 	@XmlJavaTypeAdapter(FrameTypeAdapter.class)
 	@XmlAttribute(name = "FrameType")
 	protected FrameType frameType;
@@ -45,15 +53,15 @@ public abstract class View {
 	@XmlJavaTypeAdapter(ColorAdapter.class)
 	@XmlAttribute(name = "FillColor")
 	protected Color fillColor;
-	//@XmlAttribute(name = "Format")
+	// @XmlAttribute(name = "Format")
 	protected transient Integer format;
-	//@XmlAttribute(name = "FormatString")
+	// @XmlAttribute(name = "FormatString")
 	protected transient String formatString;
 	@XmlAttribute(name = "Visible")
 	protected boolean visible = true;
 	@XmlElement(name = "Memo")
 	protected String memo;
-	//@XmlElement(name = "Script")
+	// @XmlElement(name = "Script")
 	protected transient String script;
 
 	public String getName() {
@@ -94,6 +102,38 @@ public abstract class View {
 
 	public void setHeight(float value) {
 		this.height = value;
+	}
+
+	public float getBoundLeft() {
+		return boundLeft;
+	}
+
+	public void setBoundLeft(float boundLeft) {
+		this.boundLeft = boundLeft;
+	}
+
+	public float getBoundTop() {
+		return boundTop;
+	}
+
+	public void setBoundTop(float boundTop) {
+		this.boundTop = boundTop;
+	}
+
+	public float getBoundWidth() {
+		return boundWidth;
+	}
+
+	public void setBoundWidth(float boundWidth) {
+		this.boundWidth = boundWidth;
+	}
+
+	public float getBoundHeight() {
+		return boundHeight;
+	}
+
+	public void setBoundHeight(float boundHeight) {
+		this.boundHeight = boundHeight;
 	}
 
 	public int getFlags() {

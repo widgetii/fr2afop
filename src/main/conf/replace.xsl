@@ -74,17 +74,7 @@
 	<!-- ======================================= -->
 	<xsl:template match="MemoView[@FontName=('IntP36DlTt', 'C39HrP24DmTt')]">
 		<xsl:element name="BarCodeView">
-			<xsl:attribute name="Name"><xsl:value-of select="attribute::Name" /></xsl:attribute>
-			<xsl:attribute name="Left"><xsl:value-of select="attribute::Left" /></xsl:attribute>
-			<xsl:attribute name="Top"><xsl:value-of select="attribute::Top" /></xsl:attribute>
-			<xsl:attribute name="Width"><xsl:value-of select="attribute::Width" /></xsl:attribute>
-			<xsl:attribute name="Height"><xsl:value-of select="attribute::Height" /></xsl:attribute>
-			<xsl:attribute name="FrameType"><xsl:value-of select="attribute::FrameType" /></xsl:attribute>
-			<xsl:attribute name="FrameStyle"><xsl:value-of select="attribute::FrameStyle" /></xsl:attribute>
-			<xsl:attribute name="FrameWidth"><xsl:value-of select="attribute::FrameWidth" /></xsl:attribute>
-			<xsl:attribute name="FrameColor"><xsl:value-of select="attribute::FrameColor" /></xsl:attribute>
-			<xsl:attribute name="FillColor"><xsl:value-of select="attribute::FillColor" /></xsl:attribute>
-			<xsl:attribute name="Visible"><xsl:value-of select="attribute::Visible" /></xsl:attribute>
+			<xsl:apply-templates select="@*" />
 
 			<xsl:attribute name="CheckSum">true</xsl:attribute>
 			<xsl:attribute name="ShowText">true</xsl:attribute>
@@ -98,10 +88,8 @@
 					<xsl:attribute name="BarCodeType">code39</xsl:attribute>
 				</xsl:when>
 			</xsl:choose>
-
-			<xsl:element name="Memo">
-				<xsl:value-of select="Memo" />
-			</xsl:element>
+			
+			<xsl:apply-templates select="node()" />
 		</xsl:element>
 	</xsl:template>
 

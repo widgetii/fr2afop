@@ -683,6 +683,10 @@ public class FreeReportReader implements ReportReader {
 		float top = dis.readInt();
 		float width = dis.readInt();
 		float height = dis.readInt();
+		float boundLeft = left;
+		float boundTop = top;
+		float boundWidth = width;
+		float boundHeight = height;
 
 		int flags = dis.readUnsignedShort();
 		view.setFlags(flags);
@@ -744,6 +748,10 @@ public class FreeReportReader implements ReportReader {
 		top = top * mmInUnitsY;
 		width = width * mmInUnitsX;
 		height = height * mmInUnitsY;
+		boundLeft = boundLeft * mmInUnitsX;
+		boundTop = boundTop * mmInUnitsY;
+		boundWidth = boundWidth * mmInUnitsX;
+		boundHeight = boundHeight * mmInUnitsY;
 
 		float areaLeft, areaTop, areaWidth, areaHeight;
 		if (page.isUseMargins()) {
@@ -762,6 +770,10 @@ public class FreeReportReader implements ReportReader {
 		view.setTop((top - areaTop) / areaHeight * 100f);
 		view.setWidth(width / areaWidth * 100f);
 		view.setHeight(height / areaHeight * 100f);
+		view.setBoundLeft((boundLeft - areaLeft) / areaWidth * 100f);
+		view.setBoundTop((boundTop - areaTop) / areaHeight * 100f);
+		view.setBoundWidth(boundWidth / areaWidth * 100f);
+		view.setBoundHeight(boundHeight / areaHeight * 100f);
 	}
 
 	protected void readView(MemoView view) throws IOException {
@@ -797,6 +809,9 @@ public class FreeReportReader implements ReportReader {
 	}
 
 	protected void readView(PictureView view) throws IOException {
+		view.setCentered((view.getFlags() & ViewFlag.PictCenter) == ViewFlag.PictCenter);
+		view.setKeepRatio((view.getFlags() & ViewFlag.PictRatio) == ViewFlag.PictRatio);
+
 		AbstractImage image = null;
 
 		int pictureType = dis.readUnsignedByte();

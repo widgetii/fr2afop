@@ -323,6 +323,47 @@
 		<xsl:param name="viewable-area-height" />
 		<xsl:param name="page-number" />
 
+		<xsl:choose>
+			<xsl:when test="$band-name[@Stretched = 'true']">
+				<xsl:call-template name="band-with-dataset-stretch">
+					<xsl:with-param name="band-name" select="$band-name" />
+					<xsl:with-param name="band-header" select="$band-header" />
+					<xsl:with-param name="band-footer" select="$band-footer" />
+					<xsl:with-param name="column-header" select="$column-header" />
+					<xsl:with-param name="column-footer" select="$column-footer" />
+					<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+					<xsl:with-param name="viewable-area-height" select="$viewable-area-height" />
+					<xsl:with-param name="page-number" select="$page-number" />
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="band-with-dataset-no-stretch">
+					<xsl:with-param name="band-name" select="$band-name" />
+					<xsl:with-param name="band-header" select="$band-header" />
+					<xsl:with-param name="band-footer" select="$band-footer" />
+					<xsl:with-param name="column-header" select="$column-header" />
+					<xsl:with-param name="column-footer" select="$column-footer" />
+					<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+					<xsl:with-param name="viewable-area-height" select="$viewable-area-height" />
+					<xsl:with-param name="page-number" select="$page-number" />
+				</xsl:call-template>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- ====================================== -->
+	<!-- template: band-with-dataset-no-stretch -->
+	<!-- ====================================== -->
+	<xsl:template name="band-with-dataset-no-stretch">
+		<xsl:param name="band-name" />
+		<xsl:param name="band-header" />
+		<xsl:param name="band-footer" />
+		<xsl:param name="column-header" />
+		<xsl:param name="column-footer" />
+		<xsl:param name="viewable-area-width" />
+		<xsl:param name="viewable-area-height" />
+		<xsl:param name="page-number" />
+
 		<fo:table>
 			<fo:table-header>
 				<fo:table-row>
@@ -394,6 +435,170 @@
 		</fo:table>
 	</xsl:template>
 
+	<!-- =================================== -->
+	<!-- template: band-with-dataset-stretch -->
+	<!-- =================================== -->
+	<xsl:template name="band-with-dataset-stretch">
+		<xsl:param name="band-name" />
+		<xsl:param name="band-header" />
+		<xsl:param name="band-footer" />
+		<xsl:param name="column-header" />
+		<xsl:param name="column-footer" />
+		<xsl:param name="viewable-area-width" />
+		<xsl:param name="viewable-area-height" />
+		<xsl:param name="page-number" />
+
+		<!-- Sort views by left position -->
+		<xsl:variable name="column-views" as="node()*">
+			<xsl:perform-sort select="$band-name/ChildViews/*">
+				<xsl:sort select="@Left * 1.0" />
+			</xsl:perform-sort>
+		</xsl:variable>
+
+		<fo:table>
+			<xsl:for-each select="$column-views">
+				<!-- Insert fake column as ident -->
+				<xsl:if test="position() = 1">
+					<fo:table-column>
+						<xsl:attribute name="column-width"><xsl:value-of select="$viewable-area-width * @BoundLeft div 100" />mm</xsl:attribute>
+					</fo:table-column>
+				</xsl:if>
+
+				<!-- Determine normal column width -->
+				<fo:table-column>
+					<xsl:attribute name="column-width"><xsl:value-of select="$viewable-area-width * @BoundWidth div 100" />mm</xsl:attribute>
+				</fo:table-column>
+			</xsl:for-each>
+
+			<fo:table-header>
+				<fo:table-row>
+					<!-- Sort views by left position -->
+					<xsl:variable name="table-header-column-views" as="node()*">
+						<xsl:perform-sort select="$column-header/ChildViews/*">
+							<xsl:sort select="@Left * 1.0" />
+						</xsl:perform-sort>
+					</xsl:variable>
+
+					<xsl:call-template name="stretched-table-row">
+						<xsl:with-param name="column-views" select="$table-header-column-views" />
+						<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+						<xsl:with-param name="viewable-area-height" select="$column-header/@Height * $viewable-area-height div 100" />
+						<xsl:with-param name="page-number" select="$page-number" />
+					</xsl:call-template>
+				</fo:table-row>
+			</fo:table-header>
+
+			<fo:table-footer>
+				<fo:table-row>
+					<!-- Sort views by left position -->
+					<xsl:variable name="table-footer-column-views" as="node()*">
+						<xsl:perform-sort select="$column-footer/ChildViews/*">
+							<xsl:sort select="@Left * 1.0" />
+						</xsl:perform-sort>
+					</xsl:variable>
+
+					<xsl:call-template name="stretched-table-row">
+						<xsl:with-param name="column-views" select="$table-footer-column-views" />
+						<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+						<xsl:with-param name="viewable-area-height" select="$column-footer/@Height * $viewable-area-height div 100" />
+						<xsl:with-param name="page-number" select="$page-number" />
+					</xsl:call-template>
+				</fo:table-row>
+			</fo:table-footer>
+
+			<fo:table-body>
+				<!-- Data header views -->
+				<fo:table-row>
+					<!-- Sort views by left position -->
+					<xsl:variable name="band-header-column-views" as="node()*">
+						<xsl:perform-sort select="$band-header/ChildViews/*">
+							<xsl:sort select="@Left * 1.0" />
+						</xsl:perform-sort>
+					</xsl:variable>
+
+					<xsl:call-template name="stretched-table-row">
+						<xsl:with-param name="column-views" select="$band-header-column-views" />
+						<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+						<xsl:with-param name="viewable-area-height" select="$band-header/@Height * $viewable-area-height div 100" />
+						<xsl:with-param name="page-number" select="$page-number" />
+					</xsl:call-template>
+				</fo:table-row>
+				<!-- Data views -->
+				<xsl:for-each select="//Datasets/Dataset[@Name=$band-name/@Dataset]/Rows/*">
+					<xsl:variable name="dataset-row" select="current()" />
+					<xsl:variable name="dataset-row-position" select="position()" />
+
+					<fo:table-row>
+						<xsl:call-template name="stretched-table-row">
+							<xsl:with-param name="column-views" select="$column-views" />
+							<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+							<xsl:with-param name="viewable-area-height" select="$band-name/@Height * $viewable-area-height div 100" />
+							<xsl:with-param name="dataset-row" select="$dataset-row" />
+							<xsl:with-param name="dataset-row-position" select="$dataset-row-position" />
+							<xsl:with-param name="page-number" select="$page-number" />
+						</xsl:call-template>
+					</fo:table-row>
+				</xsl:for-each>
+				<!-- Data footer views -->
+				<fo:table-row>
+					<!-- Sort views by left position -->
+					<xsl:variable name="band-footer-column-views" as="node()*">
+						<xsl:perform-sort select="$band-footer/ChildViews/*">
+							<xsl:sort select="@Left * 1.0" />
+						</xsl:perform-sort>
+					</xsl:variable>
+
+					<xsl:call-template name="stretched-table-row">
+						<xsl:with-param name="column-views" select="$band-footer-column-views" />
+						<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+						<xsl:with-param name="viewable-area-height" select="$band-footer/@Height * $viewable-area-height div 100" />
+						<xsl:with-param name="page-number" select="$page-number" />
+					</xsl:call-template>
+				</fo:table-row>
+			</fo:table-body>
+		</fo:table>
+	</xsl:template>
+
+	<!-- ============================= -->
+	<!-- template: stretched-table-row -->
+	<!-- ============================= -->
+	<xsl:template name="stretched-table-row">
+		<xsl:param name="column-views" />
+		<xsl:param name="viewable-area-width" />
+		<xsl:param name="viewable-area-height" />
+		<xsl:param name="dataset-row" required="no" />
+		<xsl:param name="dataset-row-position" required="no" />
+		<xsl:param name="page-number" />
+
+		<!-- Insert fake column as ident -->
+		<fo:table-cell>
+			<fo:block />
+		</fo:table-cell>
+
+		<xsl:for-each select="$column-views">
+			<!-- Insert normal column -->
+			<fo:table-cell>
+				<!-- Border/Background -->
+				<xsl:attribute name="background-color"><xsl:value-of select="attribute::FillColor" /></xsl:attribute>
+				<xsl:attribute name="border-color"><xsl:value-of select="attribute::FrameColor" /></xsl:attribute>
+				<xsl:attribute name="border-width"><xsl:value-of select="attribute::FrameWidth" />pt</xsl:attribute>
+				<xsl:attribute name="border-style"><xsl:value-of select="attribute::FrameStyle" /></xsl:attribute>
+
+				<!-- Render views -->
+				<xsl:call-template name="view-choose-simple">
+					<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+					<xsl:with-param name="viewable-area-height" select="$viewable-area-height" />
+					<xsl:with-param name="dataset-row" select="$dataset-row" />
+					<xsl:with-param name="dataset-row-position" select="$dataset-row-position" />
+					<xsl:with-param name="page-number" select="$page-number" />
+				</xsl:call-template>
+
+				<!-- Insert empty block for safety -->
+				<fo:block />
+			</fo:table-cell>
+		</xsl:for-each>
+	</xsl:template>
+
 	<!-- ===================== -->
 	<!-- template: view-choose -->
 	<!-- ===================== -->
@@ -436,6 +641,48 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<!-- ============================ -->
+	<!-- template: view-choose-simple -->
+	<!-- ============================ -->
+	<xsl:template name="view-choose-simple">
+		<xsl:param name="viewable-area-width" />
+		<xsl:param name="viewable-area-height" />
+		<xsl:param name="dataset-row" required="no" />
+		<xsl:param name="dataset-row-position" required="no" />
+		<xsl:param name="page-number" />
+
+		<xsl:choose>
+			<xsl:when test="name() = 'MemoView'">
+				<xsl:call-template name="memo-view-simple">
+					<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+					<xsl:with-param name="viewable-area-height" select="$viewable-area-height" />
+					<xsl:with-param name="dataset-row" select="$dataset-row" />
+					<xsl:with-param name="dataset-row-position" select="$dataset-row-position" />
+					<xsl:with-param name="page-number" select="$page-number" />
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:when test="name() = 'PictureView'">
+				<xsl:call-template name="picture-view-simple">
+					<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+					<xsl:with-param name="viewable-area-height" select="$viewable-area-height" />
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:when test="name() = 'LineView'">
+			</xsl:when>
+			<xsl:when test="name() = 'SubReportView'">
+			</xsl:when>
+			<xsl:when test="name() = 'BarCodeView'">
+				<xsl:call-template name="bar-code-view-simple">
+					<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+					<xsl:with-param name="viewable-area-height" select="$viewable-area-height" />
+					<xsl:with-param name="dataset-row" select="$dataset-row" />
+					<xsl:with-param name="dataset-row-position" select="$dataset-row-position" />
+					<xsl:with-param name="page-number" select="$page-number" />
+				</xsl:call-template>
+			</xsl:when>
+		</xsl:choose>
+	</xsl:template>
+
 	<!-- ======================= -->
 	<!-- template: bar-code-view -->
 	<!-- ======================= -->
@@ -446,16 +693,7 @@
 		<xsl:param name="dataset-row-position" required="no" />
 		<xsl:param name="page-number" />
 
-		<xsl:variable name="message">
-			<xsl:call-template name="text-var">
-				<xsl:with-param name="text" select="Memo" />
-				<xsl:with-param name="dataset-row" select="$dataset-row" />
-				<xsl:with-param name="dataset-row-position" select="$dataset-row-position" />
-				<xsl:with-param name="page-number" select="$page-number" />
-			</xsl:call-template>
-		</xsl:variable>
-
-		<xsl:if test="attribute::Visible = 'true' and fn:normalize-space($message) != ''">
+		<xsl:if test="attribute::Visible = 'true'">
 			<fo:block-container absolute-position="absolute">
 				<!-- Top/Left Corner -->
 				<xsl:attribute name="left"><xsl:value-of select="$viewable-area-width * @Left div 100" />mm</xsl:attribute>
@@ -495,54 +733,87 @@
 					</xsl:otherwise>
 				</xsl:choose>
 
-				<!-- Vertical alignment -->
-				<xsl:attribute name="display-align">center</xsl:attribute>
+				<xsl:call-template name="bar-code-view-simple">
+					<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+					<xsl:with-param name="viewable-area-height" select="$viewable-area-height" />
+					<xsl:with-param name="dataset-row" select="$dataset-row" />
+					<xsl:with-param name="dataset-row-position" select="$dataset-row-position" />
+					<xsl:with-param name="page-number" select="$page-number" />
+				</xsl:call-template>
 
-				<!-- BarCode -->
-				<fo:block font-size="0" text-align="center">
-					<fo:instream-foreign-object>
-						<barcode:barcode>
-							<xsl:attribute name="message"><xsl:value-of select="fn:normalize-space($message)" /></xsl:attribute>
-							<xsl:attribute name="orientation"><xsl:value-of select="attribute::Angle" /></xsl:attribute>
-
-							<xsl:element name="{concat('barcode:', @BarCodeType)}">
-
-								<!-- BarCode height -->
-								<xsl:choose>
-									<xsl:when test="attribute::Angle = '90' or attribute::Angle = '270'">
-										<barcode:height>
-											<xsl:value-of select="concat($viewable-area-width * @Width div 100, 'mm')" />
-										</barcode:height>
-									</xsl:when>
-									<xsl:otherwise>
-										<barcode:height>
-											<xsl:value-of select="concat($viewable-area-height * @Height div 100, 'mm')" />
-										</barcode:height>
-									</xsl:otherwise>
-								</xsl:choose>
-
-								<!-- BarCode Human-readable -->
-								<xsl:if test="attribute::ShowText = 'false'">
-									<barcode:human-readable>
-										<barcode:placement>none</barcode:placement>
-									</barcode:human-readable>
-								</xsl:if>
-
-								<!-- Checksum -->
-								<xsl:choose>
-									<xsl:when test="attribute::CheckSum = 'false'">
-										<barcode:checksum>ignore</barcode:checksum>
-									</xsl:when>
-									<xsl:otherwise>
-										<barcode:checksum>auto</barcode:checksum>
-									</xsl:otherwise>
-								</xsl:choose>
-
-							</xsl:element>
-						</barcode:barcode>
-					</fo:instream-foreign-object>
-				</fo:block>
+				<!-- Insert empty block for safety -->
+				<fo:block />
 			</fo:block-container>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- ============================== -->
+	<!-- template: bar-code-view-simple -->
+	<!-- ============================== -->
+	<xsl:template name="bar-code-view-simple">
+		<xsl:param name="viewable-area-width" />
+		<xsl:param name="viewable-area-height" />
+		<xsl:param name="dataset-row" required="no" />
+		<xsl:param name="dataset-row-position" required="no" />
+		<xsl:param name="page-number" />
+
+		<xsl:variable name="message">
+			<xsl:call-template name="text-var">
+				<xsl:with-param name="text" select="Memo" />
+				<xsl:with-param name="dataset-row" select="$dataset-row" />
+				<xsl:with-param name="dataset-row-position" select="$dataset-row-position" />
+				<xsl:with-param name="page-number" select="$page-number" />
+			</xsl:call-template>
+		</xsl:variable>
+
+		<xsl:if test="attribute::Visible = 'true' and fn:normalize-space($message) != ''">
+			<!-- Vertical alignment -->
+			<xsl:attribute name="display-align">center</xsl:attribute>
+
+			<!-- BarCode -->
+			<fo:block font-size="0" text-align="center">
+				<fo:instream-foreign-object>
+					<barcode:barcode>
+						<xsl:attribute name="message"><xsl:value-of select="fn:normalize-space($message)" /></xsl:attribute>
+						<xsl:attribute name="orientation"><xsl:value-of select="attribute::Angle" /></xsl:attribute>
+
+						<xsl:element name="{concat('barcode:', @BarCodeType)}">
+
+							<!-- BarCode height -->
+							<xsl:choose>
+								<xsl:when test="attribute::Angle = '90' or attribute::Angle = '270'">
+									<barcode:height>
+										<xsl:value-of select="concat($viewable-area-width * @Width div 100, 'mm')" />
+									</barcode:height>
+								</xsl:when>
+								<xsl:otherwise>
+									<barcode:height>
+										<xsl:value-of select="concat($viewable-area-height * @Height div 100, 'mm')" />
+									</barcode:height>
+								</xsl:otherwise>
+							</xsl:choose>
+
+							<!-- BarCode Human-readable -->
+							<xsl:if test="attribute::ShowText = 'false'">
+								<barcode:human-readable>
+									<barcode:placement>none</barcode:placement>
+								</barcode:human-readable>
+							</xsl:if>
+
+							<!-- Checksum -->
+							<xsl:choose>
+								<xsl:when test="attribute::CheckSum = 'false'">
+									<barcode:checksum>ignore</barcode:checksum>
+								</xsl:when>
+								<xsl:otherwise>
+									<barcode:checksum>auto</barcode:checksum>
+								</xsl:otherwise>
+							</xsl:choose>
+
+						</xsl:element>
+					</barcode:barcode>
+				</fo:instream-foreign-object>
+			</fo:block>
 		</xsl:if>
 	</xsl:template>
 
@@ -594,24 +865,57 @@
 					</xsl:otherwise>
 				</xsl:choose>
 
-				<!-- Graphic -->
-				<fo:block font-size="0">
-					<fo:external-graphic>
-						<!-- Width/Height -->
-						<xsl:attribute name="content-width"><xsl:value-of select="$viewable-area-width * @Width div 100" />mm</xsl:attribute>
-						<xsl:attribute name="content-height"><xsl:value-of select="$viewable-area-height * @Height div 100" />mm</xsl:attribute>
+				<!-- Render Graphic -->
+				<xsl:call-template name="picture-view-simple">
+					<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+					<xsl:with-param name="viewable-area-height" select="$viewable-area-height" />
+				</xsl:call-template>
 
-						<!-- Image Source -->
-						<xsl:attribute name="src">
+				<!-- Insert empty block for safety -->
+				<fo:block />
+			</fo:block-container>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- ============================= -->
+	<!-- template: picture-view-simple -->
+	<!-- ============================= -->
+	<xsl:template name="picture-view-simple">
+		<xsl:param name="viewable-area-width" />
+		<xsl:param name="viewable-area-height" />
+
+		<xsl:if test="attribute::Visible = 'true' and boolean(*/Content) and boolean(*/@Mime)">
+			<!-- Graphic -->
+			<fo:block font-size="0">
+				<xsl:if test="attribute::Centered = 'true'">
+					<xsl:attribute name="text-align">center</xsl:attribute>
+					<xsl:attribute name="display-align">center</xsl:attribute>
+				</xsl:if>
+
+				<fo:external-graphic>
+					<xsl:choose>
+						<xsl:when test="attribute::KeepRatio = 'true'">
+							<xsl:attribute name="scaling">uniform</xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:attribute name="scaling">non-uniform</xsl:attribute>
+						</xsl:otherwise>
+					</xsl:choose>
+
+					<!-- Width/Height -->
+					<xsl:attribute name="content-width"><xsl:value-of select="$viewable-area-width * @Width div 100" />mm</xsl:attribute>
+					<xsl:attribute name="content-height"><xsl:value-of select="$viewable-area-height * @Height div 100" />mm</xsl:attribute>
+
+					<!-- Image Source -->
+					<xsl:attribute name="src">
 							<xsl:text>url('data:</xsl:text>
 							<xsl:value-of select="*/@Mime" /> 
 							<xsl:text>;base64,</xsl:text>
 							<xsl:value-of select="*/Content" />
 							<xsl:text>')</xsl:text>
 						</xsl:attribute>
-					</fo:external-graphic>
-				</fo:block>
-			</fo:block-container>
+				</fo:external-graphic>
+			</fo:block>
 		</xsl:if>
 	</xsl:template>
 
@@ -627,7 +931,6 @@
 
 		<xsl:if test="attribute::Visible = 'true'">
 			<fo:block-container absolute-position="absolute">
-
 				<!-- Top/Left Corner -->
 				<xsl:attribute name="left"><xsl:value-of select="$viewable-area-width * @Left div 100" />mm</xsl:attribute>
 				<xsl:attribute name="top"><xsl:value-of select="$viewable-area-height * @Top div 100" />mm</xsl:attribute>
@@ -676,39 +979,64 @@
 					</xsl:otherwise>
 				</xsl:choose>
 
-				<!-- Vertical Alignment -->
-				<xsl:choose>
-					<xsl:when test="attribute::VerticalAlign = 'middle'">
-						<xsl:attribute name="display-align">center</xsl:attribute>
-					</xsl:when>
-					<xsl:when test="attribute::VerticalAlign = 'bottom'">
-						<xsl:attribute name="display-align">after</xsl:attribute>
-					</xsl:when>
-				</xsl:choose>
-
 				<!-- Clipping Text -->
 				<xsl:if test="attribute::Rotate = 'false'">
 					<xsl:attribute name="overflow">hidden</xsl:attribute>
 				</xsl:if>
 
-				<!-- Font/Text Attributes -->
-				<fo:block linefeed-treatment="preserve" white-space-treatment="preserve" white-space-collapse="false">
-					<xsl:attribute name="font-family"><xsl:value-of select="attribute::FontName" /></xsl:attribute>
-					<xsl:attribute name="font-size"><xsl:value-of select="attribute::FontSize" /></xsl:attribute>
-					<xsl:attribute name="font-weight"><xsl:value-of select="attribute::FontWeight" /></xsl:attribute>
-					<xsl:attribute name="font-style"><xsl:value-of select="attribute::FontStyle" /></xsl:attribute>
-					<xsl:attribute name="text-decoration"><xsl:value-of select="attribute::TextDecoration" /></xsl:attribute>
-					<xsl:attribute name="color"><xsl:value-of select="attribute::FontColor" /></xsl:attribute>
-					<xsl:attribute name="text-align"><xsl:value-of select="attribute::TextAlign" /></xsl:attribute>
+				<!-- Render MemoView -->
+				<xsl:call-template name="memo-view-simple">
+					<xsl:with-param name="viewable-area-width" select="$viewable-area-width" />
+					<xsl:with-param name="viewable-area-height" select="$viewable-area-height" />
+					<xsl:with-param name="dataset-row" select="$dataset-row" />
+					<xsl:with-param name="dataset-row-position" select="$dataset-row-position" />
+					<xsl:with-param name="page-number" select="$page-number" />
+				</xsl:call-template>
 
-					<xsl:call-template name="text-var">
-						<xsl:with-param name="text" select="Memo" />
-						<xsl:with-param name="dataset-row" select="$dataset-row" />
-						<xsl:with-param name="dataset-row-position" select="$dataset-row-position" />
-						<xsl:with-param name="page-number" select="$page-number" />
-					</xsl:call-template>
-				</fo:block>
+				<!-- Insert empty block for safety -->
+				<fo:block />
 			</fo:block-container>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- ========================== -->
+	<!-- template: memo-view-simple -->
+	<!-- ========================== -->
+	<xsl:template name="memo-view-simple">
+		<xsl:param name="viewable-area-width" />
+		<xsl:param name="viewable-area-height" />
+		<xsl:param name="dataset-row" required="no" />
+		<xsl:param name="dataset-row-position" required="no" />
+		<xsl:param name="page-number" />
+
+		<xsl:if test="attribute::Visible = 'true'">
+			<!-- Vertical Alignment -->
+			<xsl:choose>
+				<xsl:when test="attribute::VerticalAlign = 'middle'">
+					<xsl:attribute name="display-align">center</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="attribute::VerticalAlign = 'bottom'">
+					<xsl:attribute name="display-align">after</xsl:attribute>
+				</xsl:when>
+			</xsl:choose>
+
+			<!-- Font/Text Attributes -->
+			<fo:block linefeed-treatment="preserve" white-space-treatment="preserve" white-space-collapse="false">
+				<xsl:attribute name="font-family"><xsl:value-of select="attribute::FontName" /></xsl:attribute>
+				<xsl:attribute name="font-size"><xsl:value-of select="attribute::FontSize" /></xsl:attribute>
+				<xsl:attribute name="font-weight"><xsl:value-of select="attribute::FontWeight" /></xsl:attribute>
+				<xsl:attribute name="font-style"><xsl:value-of select="attribute::FontStyle" /></xsl:attribute>
+				<xsl:attribute name="text-decoration"><xsl:value-of select="attribute::TextDecoration" /></xsl:attribute>
+				<xsl:attribute name="color"><xsl:value-of select="attribute::FontColor" /></xsl:attribute>
+				<xsl:attribute name="text-align"><xsl:value-of select="attribute::TextAlign" /></xsl:attribute>
+
+				<xsl:call-template name="text-var">
+					<xsl:with-param name="text" select="Memo" />
+					<xsl:with-param name="dataset-row" select="$dataset-row" />
+					<xsl:with-param name="dataset-row-position" select="$dataset-row-position" />
+					<xsl:with-param name="page-number" select="$page-number" />
+				</xsl:call-template>
+			</fo:block>
 		</xsl:if>
 	</xsl:template>
 

@@ -159,9 +159,7 @@ This is first production grade release of "FreeReport to Apache FOP Converter".
 The following features of FreeReport engine have NOT been implemented:
 	Page can't be splitted in columns.
 	The following bands are not supported: Detail, SubDetail, Overlay, Group, VarColumn.
-	Bands can't be stretched.
 	LineView and SubReportView are not rendered.
-	MemoView flags (stretched, word-wrap) are not supported.
 	MemoView 'format' flags are not used.
 	MemoView highlight field is not used.
 	
