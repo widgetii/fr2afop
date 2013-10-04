@@ -106,7 +106,10 @@
 				<Parameter Name="post_num">14</Parameter>
 			</Parameters>
 			<Query><![CDATA[
-				select * from FORM_103 f103
+				select 
+					f103.*, 
+					(INSRRATE + MASSRATE + AIRRATE) as ITOGOZAPERESULKU
+				from FORM_103 f103
 				left join MAILOTMETKI mo on mo.BARCODE = f103.BARCODE
 				where 
 					f103.NSPI = ${list_num} and

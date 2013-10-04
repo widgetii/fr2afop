@@ -152,7 +152,9 @@
 					'\[F16ParcelNumber1\]',
 					'\[F16SumValue1\]',
 					'\[F16ParcelNumber2\]',
-					'\[F16SumValue2\]'			
+					'\[F16SumValue2\]',
+					
+					'\[pre_rep.IBQuery2.&quot;MASSRATE&quot;\]\s*\+\s*\[pre_rep.IBQuery2.&quot;INSRRATE&quot;\]\s*\+\s*\[pre_rep.IBQuery2.&quot;AIRRATE&quot;\]'
 				)" />
 				<xsl:variable name="to"
 					select="(
@@ -196,7 +198,9 @@
 					'[Copy([F16ParcelNumber1], 1, 6)] [Copy([F16ParcelNumber1], 7, 2)] [Copy([F16ParcelNumber1], 9, 5)] [Copy([F16ParcelNumber1], 14, 1)]',
 					'[Str([F16SumValue1], 2)]',
 					'[Copy([F16ParcelNumber2], 1, 6)] [Copy([F16ParcelNumber2], 7, 2)] [Copy([F16ParcelNumber2], 9, 5)] [Copy([F16ParcelNumber2], 14, 1)]',
-					'[Str([F16SumValue2], 2)]'						
+					'[Str([F16SumValue2], 2)]',
+
+					'[pre_rep.IBQuery2.&quot;ITOGOZAPERESULKU&quot;]'
 				)" />
 
 				<xsl:value-of select="functx:replace-multi(Memo, $fr, $to)" />
