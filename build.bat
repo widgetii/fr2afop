@@ -1,4 +1,4 @@
-CALL mvn clean package
+CALL mvn clean install
 
 ECHO.
 PAUSE
