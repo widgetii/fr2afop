@@ -7,6 +7,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.print.Doc;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintException;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
@@ -18,14 +25,14 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
-import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
+import org.apache.fop.render.print.PageableRenderer;
 import org.xml.sax.SAXException;
 
 import ru.aplix.converters.fr2afop.reader.InputStreamOpener;
@@ -45,9 +52,18 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 	private static FopFactory fopFactory = null;
 	private static Templates cachedXSLT = null;
 
-	private FopFactory getFopFactory() {
+	private FopFactory getFopFactory(String confFile) throws SAXException, IOException {
 		if (fopFactory == null) {
-			fopFactory = FopFactory.newInstance();
+			// Initialization of FOP factory for version 1.1
+			// fopFactory = FopFactory.newInstance();
+
+			// Configure fopFactory using configuration file
+			// DefaultConfigurationBuilder cfgBuilder = new
+			// DefaultConfigurationBuilder();
+			// Configuration cfg = cfgBuilder.buildFromFile(configFile);
+			// fopFactory.setUserConfig(cfg);
+
+			fopFactory = FopFactory.newInstance(new File(confFile));
 		}
 		return fopFactory;
 	}
@@ -87,21 +103,18 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 		log.info("Done\n");
 	}
 
-	private void render(File configFile) throws ConfigurationException, SAXException, IOException, TransformerException {
+	private void render(File configFile) throws ConfigurationException, SAXException, IOException, TransformerException, PrintException {
 		// Create fopFactory
-		FopFactory fopFactory = getFopFactory();
-
-		// Configure fopFactory using configuration file
-		DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
-		Configuration cfg = cfgBuilder.buildFromFile(configFile);
-		fopFactory.setUserConfig(cfg);
+		FopFactory fopFactory = getFopFactory(configFileName);
 
 		// Setup XSLT
 		Transformer transformer = getTransformer();
 
 		// Setup output
-		OutputStream out = new FileOutputStream(getOutputFileName());
-		out = new BufferedOutputStream(out);
+		OutputStream out = null;
+		if (!MimeConstants.MIME_FOP_PRINT.equals(outputFormat)) {
+			out = new BufferedOutputStream(new FileOutputStream(getOutputFileName()));
+		}
 
 		try {
 			// Setup input for XSLT transformation
@@ -113,21 +126,46 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 			}
 
 			Result res;
-			if (!MimeConstants.MIME_XSL_FO.equals(outputFormat)) {
-				// Construct fop with desired output format
-				Fop fop = fopFactory.newFop(outputFormat, out);
+			if (MimeConstants.MIME_XSL_FO.equals(outputFormat)) {
+				res = new StreamResult(out);
+
+				// Start XSLT transformation and FOP processing
+				transformer.transform(src, res);
+			} else {
+				// Set up a custom user agent so we can supply our own renderer
+				// instance
+				FOUserAgent userAgent = fopFactory.newFOUserAgent();
+				Fop fop;
+
+				if (MimeConstants.MIME_FOP_PRINT.equals(outputFormat)) {
+					PageableRenderer renderer = new PageableRenderer(userAgent);
+					userAgent.setRendererOverride(renderer);
+
+					// Construct FOP with desired output format
+					fop = fopFactory.newFop(userAgent);
+				} else {
+					// Construct fop with desired output format
+					fop = fopFactory.newFop(outputFormat, userAgent, out);
+				}
 
 				// Resulting SAX events (the generated FO)
 				// must be piped through to FOP
 				res = new SAXResult(fop.getDefaultHandler());
-			} else {
-				res = new StreamResult(out);
-			}
 
-			// Start XSLT transformation and FOP processing
-			transformer.transform(src, res);
+				// Start XSLT transformation and FOP processing
+				transformer.transform(src, res);
+
+				if (MimeConstants.MIME_FOP_PRINT.equals(outputFormat)) {
+					// Set up DocPrintJob instance
+					DocPrintJob printJob = createDocPrintJob();
+					Doc doc = new SimpleDoc(userAgent.getRendererOverride(), DocFlavor.SERVICE_FORMATTED.PAGEABLE, null);
+					printJob.print(doc, null);
+				}
+			}
 		} finally {
-			out.close();
+			if (out != null) {
+				out.close();
+			}
 		}
 	}
 
@@ -153,6 +191,23 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 			RenderXMLToOutput d = (RenderXMLToOutput) dest;
 			d.setOutputFormat(outputFormat);
 			d.setFopConfigFileName(configFileName);
+		}
+	}
+
+	private DocPrintJob createDocPrintJob() throws PrintException {
+		PrintService[] services = PrintServiceLookup.lookupPrintServices(DocFlavor.SERVICE_FORMATTED.PAGEABLE, null);
+
+		PrintService printService = null;
+		for (PrintService service : services) {
+			if (getOutputFileName().equalsIgnoreCase(service.getName())) {
+				printService = service;
+			}
+		}
+
+		if (printService != null) {
+			return printService.createPrintJob();
+		} else {
+			throw new PrintException(String.format("Printer \"%s\" not found.", getOutputFileName()));
 		}
 	}
 }

@@ -1,6 +1,6 @@
 ========================================================================
 
-						FreeReport to Apache FOP Converter
+                    FreeReport to Apache FOP Converter
 
 ========================================================================
 
@@ -133,6 +133,9 @@ Output formats:
  ops     - specifies PostScript rendering
  opng    - specifies PNG rendering
  ofo     - specifies XSL-FO transformation
+ 
+Specify \"-print <Printer Name>\" instead of \"-oxxx outputfile\" in order to print the 
+output.
 
 If not specified explicitly configuration files are taken from ./conf directory. For 
 additional details how to specify paths to configuration files, look into contents of
@@ -163,3 +166,6 @@ The following features of FreeReport engine have NOT been implemented:
 	MemoView 'format' flags are not used.
 	MemoView highlight field is not used.
 	
+Version 1.1.
+
+- added print command

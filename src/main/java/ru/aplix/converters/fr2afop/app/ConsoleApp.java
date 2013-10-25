@@ -8,16 +8,13 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xmlgraphics.util.MimeConstants;
+import org.apache.fop.apps.MimeConstants;
 
 import ru.aplix.converters.fr2afop.reader.FreeReportReader;
 import ru.aplix.converters.fr2afop.reader.FreeReportReader2217;
 import ru.aplix.converters.fr2afop.reader.XMLReportReader;
 import ru.aplix.converters.fr2afop.utils.CommandLine;
 
-// TODO: 60 stretched memo view and band view
-// TODO: 70 printing, selecting a printer, match page size
-// TODO: 80 rest of free report properties: lineview, columns, format, etc.
 // FIXME: PCL: fonts are replaced sometimes
 
 /**
@@ -88,6 +85,8 @@ public class ConsoleApp {
 		log.info(" opng    - specifies PNG rendering");
 		log.info(" ofo     - specifies XSL-FO transformation");
 		log.info("");
+		log.info("Specify \"-print <Printer Name>\" instead of \"-oxxx outputfile\" in order to print the output");
+		log.info("");
 		log.info("Configuration:");
 		log.info(" fopConfigFile  - configuration file for Apache FOP");
 		log.info(" convConfigFile - configuration file for this converter");
@@ -156,6 +155,11 @@ public class ConsoleApp {
 			} else if ("-ofo".equalsIgnoreCase(commandLine.getArg())) {
 				RenderXMLToOutput command = (RenderXMLToOutput) createNewCommand(RenderXMLToOutputImpl.class, TwofoldCommand.class, lastCommand, false);
 				command.setOutputFormat(MimeConstants.MIME_XSL_FO);
+				command.setOutputFileName(commandLine.getNextArg());
+				lastCommand = command;
+			} else if ("-print".equalsIgnoreCase(commandLine.getArg())) {
+				RenderXMLToOutput command = (RenderXMLToOutput) createNewCommand(RenderXMLToOutputImpl.class, TwofoldCommand.class, lastCommand, false);
+				command.setOutputFormat(MimeConstants.MIME_FOP_PRINT);
 				command.setOutputFileName(commandLine.getNextArg());
 				lastCommand = command;
 			}
