@@ -13,7 +13,10 @@
 		The file is optional - you can comment the line below, thus XSL transformation will
 		be omitted.
 	-->
-	<ReplacementFile>replace.xsl</ReplacementFile>
+	<ReplacementFile>
+		<Before>replace.xsl</Before>
+		<!--<After></After>-->
+	</ReplacementFile>
 	
 	<!-- 
 		=========

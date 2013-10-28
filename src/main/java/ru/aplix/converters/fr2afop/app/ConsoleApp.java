@@ -15,8 +15,6 @@ import ru.aplix.converters.fr2afop.reader.FreeReportReader2217;
 import ru.aplix.converters.fr2afop.reader.XMLReportReader;
 import ru.aplix.converters.fr2afop.utils.CommandLine;
 
-// FIXME: PCL: fonts are replaced sometimes
-
 /**
  * Console application for the project.
  */

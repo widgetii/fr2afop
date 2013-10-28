@@ -32,7 +32,8 @@ import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
-import org.apache.fop.render.print.PageableRenderer;
+import org.apache.fop.render.PrintRendererConfigurator;
+import org.apache.fop.render.print.PrintRenderer;
 import org.xml.sax.SAXException;
 
 import ru.aplix.converters.fr2afop.reader.InputStreamOpener;
@@ -138,7 +139,9 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 				Fop fop;
 
 				if (MimeConstants.MIME_FOP_PRINT.equals(outputFormat)) {
-					PageableRenderer renderer = new PageableRenderer(userAgent);
+					// Create print renderer
+					PrintRenderer renderer = new PrintRenderer(userAgent);
+					PrintRendererConfigurator.createDefaultInstance(userAgent).configure(renderer);
 					userAgent.setRendererOverride(renderer);
 
 					// Construct FOP with desired output format

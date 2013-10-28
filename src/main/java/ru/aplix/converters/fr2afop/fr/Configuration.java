@@ -17,7 +17,7 @@ import ru.aplix.converters.fr2afop.fr.dataset.Dataset;
 public class Configuration {
 
 	@XmlElement(name = "ReplacementFile")
-	private String replacementFile;
+	private ReplacementFile replacementFile;
 
 	@XmlElementWrapper(name = "Databases")
 	@XmlElement(name = "Database", type = Database.class)
@@ -27,11 +27,14 @@ public class Configuration {
 	@XmlElement(name = "Dataset", type = Dataset.class)
 	private List<Dataset> datasets;
 
-	public String getReplacementFile() {
+	public ReplacementFile getReplacementFile() {
+		if (replacementFile == null) {
+			replacementFile = new ReplacementFile();
+		}
 		return replacementFile;
 	}
 
-	public void setReplacementFile(String replacementFile) {
+	public void setReplacementFile(ReplacementFile replacementFile) {
 		this.replacementFile = replacementFile;
 	}
 

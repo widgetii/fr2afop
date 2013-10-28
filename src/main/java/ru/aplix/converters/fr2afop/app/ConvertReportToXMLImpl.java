@@ -67,18 +67,18 @@ public class ConvertReportToXMLImpl extends CommandImpl implements ConvertReport
 			@Override
 			public Report modify(Report report) throws Exception {
 				// Write report in XML format
-				File xsltFile = null;
-				if (configuration.getReplacementFile() != null) {
-					xsltFile = new File(configuration.getReplacementFile());
-					if (xsltFile == null || !xsltFile.exists()) {
-						xsltFile = new File(configurationFile.getParent(), configuration.getReplacementFile());
+				File xsltFileBefore = null;
+				if (configuration.getReplacementFile().getBefore() != null) {
+					xsltFileBefore = new File(configuration.getReplacementFile().getBefore());
+					if (xsltFileBefore == null || !xsltFileBefore.exists()) {
+						xsltFileBefore = new File(configurationFile.getParent(), configuration.getReplacementFile().getBefore());
 					}
 
 					// Save report to memory stream and restore immediately
 					// in order to perform XSLT replacements
 					final ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFFER_SIZE);
 					try {
-						ReportWriter reportWriter = new XMLReportWriter(xsltFile);
+						ReportWriter reportWriter = new XMLReportWriter(xsltFileBefore);
 						reportWriter.writeToStream(report, new OutputStreamOpener() {
 							@Override
 							public OutputStream openStream() throws IOException {
@@ -106,7 +106,15 @@ public class ConvertReportToXMLImpl extends CommandImpl implements ConvertReport
 		ValueResolver vr = new ValueResolver();
 		vr.resolve(report, configuration);
 
-		ReportWriter reportWriter = new XMLReportWriter();
+		File xsltFileAfter = null;
+		if (configuration.getReplacementFile().getAfter() != null) {
+			xsltFileAfter = new File(configuration.getReplacementFile().getAfter());
+			if (xsltFileAfter == null || !xsltFileAfter.exists()) {
+				xsltFileAfter = new File(configurationFile.getParent(), configuration.getReplacementFile().getAfter());
+			}
+		}
+
+		ReportWriter reportWriter = new XMLReportWriter(xsltFileAfter);
 		reportWriter.writeToStream(report, outputStreamOpener != null ? outputStreamOpener : new OutputStreamOpener() {
 			@Override
 			public OutputStream openStream() throws IOException {

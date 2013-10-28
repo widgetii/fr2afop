@@ -587,7 +587,104 @@ the location of this file.
       </xml-handler-->
     </renderer>
 
-    <renderer mime="application/vnd.hp-PCL">
+    <renderer mime="application/x-pcl">
+		<fonts>
+			<!-- embedded fonts -->
+			<!--
+			This information must exactly match the font specified
+			in the fo file. Otherwise it will use a default font.
+
+			For example,
+			<fo:inline font-family="Arial" font-weight="bold" font-style="normal">
+				Arial-normal-normal font
+			</fo:inline>
+			for the font triplet specified by:
+			<font-triplet name="Arial" style="normal" weight="bold"/>
+
+			If you do not want to embed the font in the pdf document
+			then do not include the "embed-url" attribute.
+			The font will be needed where the document is viewed
+			for it to be displayed properly.
+
+			possible styles: normal | italic | oblique | backslant
+			possible weights: normal | bold | 100 | 200 | 300 | 400
+							  | 500 | 600 | 700 | 800 | 900
+			(normal = 400, bold = 700)
+			-->
+			
+			<font metrics-url="arial.xml" kerning="yes" embed-url="arial.ttf">
+				<font-triplet name="Arial" style="normal" weight="normal"/>
+				<font-triplet name="ArialMT" style="normal" weight="normal"/>
+				<font-triplet name="Arial Cyr" style="normal" weight="normal"/>
+			</font>
+			<font metrics-url="arialbd.xml" kerning="yes" embed-url="arialbd.ttf">
+				<font-triplet name="Arial" style="normal" weight="bold"/>
+				<font-triplet name="ArialMT" style="normal" weight="bold"/>
+				<font-triplet name="Arial Cyr" style="normal" weight="bold"/>
+			</font>
+			<font metrics-url="ariali.xml" kerning="yes" embed-url="ariali.ttf">
+				<font-triplet name="Arial" style="italic" weight="normal"/>
+				<font-triplet name="ArialMT" style="italic" weight="normal"/>
+				<font-triplet name="Arial Cyr" style="italic" weight="normal"/>
+			</font>
+			<font metrics-url="arialbi.xml" kerning="yes" embed-url="arialbi.ttf">
+				<font-triplet name="Arial" style="italic" weight="bold"/>
+				<font-triplet name="ArialMT" style="italic" weight="bold"/>
+				<font-triplet name="Arial Cyr" style="italic" weight="bold"/>
+			</font>
+			
+			<font metrics-url="times.xml" kerning="yes" embed-url="times.ttf">
+				<font-triplet name="Times New Roman" style="normal" weight="normal"/>
+			</font>
+			<font metrics-url="timesbd.xml" kerning="yes" embed-url="timesbd.ttf">
+				<font-triplet name="Times New Roman" style="normal" weight="bold"/>
+			</font>
+			<font metrics-url="timesi.xml" kerning="yes" embed-url="timesi.ttf">
+				<font-triplet name="Times New Roman" style="italic" weight="normal"/>
+			</font>
+			<font metrics-url="timesbi.xml" kerning="yes" embed-url="timesbi.ttf">
+				<font-triplet name="Times New Roman" style="italic" weight="bold"/>
+			</font>
+			
+			<font metrics-url="cour.xml" kerning="yes" embed-url="cour.ttf">
+				<font-triplet name="Courier New" style="normal" weight="normal"/>
+				<font-triplet name="Courier New Cyr" style="normal" weight="normal"/>
+			</font>
+			<font metrics-url="courbd.xml" kerning="yes" embed-url="courbd.ttf">
+				<font-triplet name="Courier New" style="normal" weight="bold"/>
+				<font-triplet name="Courier New Cyr" style="normal" weight="bold"/>
+			</font>
+			<font metrics-url="couri.xml" kerning="yes" embed-url="couri.ttf">
+				<font-triplet name="Courier New" style="italic" weight="normal"/>
+				<font-triplet name="Courier New Cyr" style="italic" weight="normal"/>
+			</font>
+			<font metrics-url="courbi.xml" kerning="yes" embed-url="courbi.ttf">
+				<font-triplet name="Courier New" style="italic" weight="bold"/>
+				<font-triplet name="Courier New Cyr" style="italic" weight="bold"/>
+			</font>
+			
+			<font metrics-url="Posti_nr.xml" kerning="yes" embed-url="Posti_nr.ttf">
+				<font-triplet name="PostIndex" style="normal" weight="normal"/>
+				<font-triplet name="PostIndex" style="normal" weight="bold"/>
+				<font-triplet name="PostIndex" style="italic" weight="normal"/>
+				<font-triplet name="PostIndex" style="italic" weight="bold"/>
+			</font>
+			
+			<font metrics-url="IntP36DlTt.xml" kerning="yes" embed-url="IntP36DlTt.ttf">
+				<font-triplet name="IntP36DlTt" style="normal" weight="normal"/>
+				<font-triplet name="IntP36DlTt" style="normal" weight="bold"/>
+				<font-triplet name="IntP36DlTt" style="italic" weight="normal"/>
+				<font-triplet name="IntP36DlTt" style="italic" weight="bold"/>
+			</font>
+			
+			<font metrics-url="C39HrP24DmTt.xml" kerning="yes" embed-url="C39HrP24DmTt.ttf">
+				<font-triplet name="C39HrP24DmTt" style="normal" weight="normal"/>
+				<font-triplet name="C39HrP24DmTt" style="normal" weight="bold"/>
+				<font-triplet name="C39HrP24DmTt" style="italic" weight="normal"/>
+				<font-triplet name="C39HrP24DmTt" style="italic" weight="bold"/>
+			</font>
+		        
+		</fonts>
     </renderer>
 
     <!-- MIF does not have a renderer
@@ -718,6 +815,106 @@ the location of this file.
     <renderer mime="text/rtf">
     </renderer>
     -->
+	
+	<renderer mime="application/X-fop-print">	        
+		<fonts>
+			<!-- embedded fonts -->
+			<!--
+			This information must exactly match the font specified
+			in the fo file. Otherwise it will use a default font.
+
+			For example,
+			<fo:inline font-family="Arial" font-weight="bold" font-style="normal">
+				Arial-normal-normal font
+			</fo:inline>
+			for the font triplet specified by:
+			<font-triplet name="Arial" style="normal" weight="bold"/>
+
+			If you do not want to embed the font in the pdf document
+			then do not include the "embed-url" attribute.
+			The font will be needed where the document is viewed
+			for it to be displayed properly.
+
+			possible styles: normal | italic | oblique | backslant
+			possible weights: normal | bold | 100 | 200 | 300 | 400
+							  | 500 | 600 | 700 | 800 | 900
+			(normal = 400, bold = 700)
+			-->
+			
+			<font metrics-url="arial.xml" kerning="yes" embed-url="arial.ttf">
+				<font-triplet name="Arial" style="normal" weight="normal"/>
+				<font-triplet name="ArialMT" style="normal" weight="normal"/>
+				<font-triplet name="Arial Cyr" style="normal" weight="normal"/>
+			</font>
+			<font metrics-url="arialbd.xml" kerning="yes" embed-url="arialbd.ttf">
+				<font-triplet name="Arial" style="normal" weight="bold"/>
+				<font-triplet name="ArialMT" style="normal" weight="bold"/>
+				<font-triplet name="Arial Cyr" style="normal" weight="bold"/>
+			</font>
+			<font metrics-url="ariali.xml" kerning="yes" embed-url="ariali.ttf">
+				<font-triplet name="Arial" style="italic" weight="normal"/>
+				<font-triplet name="ArialMT" style="italic" weight="normal"/>
+				<font-triplet name="Arial Cyr" style="italic" weight="normal"/>
+			</font>
+			<font metrics-url="arialbi.xml" kerning="yes" embed-url="arialbi.ttf">
+				<font-triplet name="Arial" style="italic" weight="bold"/>
+				<font-triplet name="ArialMT" style="italic" weight="bold"/>
+				<font-triplet name="Arial Cyr" style="italic" weight="bold"/>
+			</font>
+			
+			<font metrics-url="times.xml" kerning="yes" embed-url="times.ttf">
+				<font-triplet name="Times New Roman" style="normal" weight="normal"/>
+			</font>
+			<font metrics-url="timesbd.xml" kerning="yes" embed-url="timesbd.ttf">
+				<font-triplet name="Times New Roman" style="normal" weight="bold"/>
+			</font>
+			<font metrics-url="timesi.xml" kerning="yes" embed-url="timesi.ttf">
+				<font-triplet name="Times New Roman" style="italic" weight="normal"/>
+			</font>
+			<font metrics-url="timesbi.xml" kerning="yes" embed-url="timesbi.ttf">
+				<font-triplet name="Times New Roman" style="italic" weight="bold"/>
+			</font>
+			
+			<font metrics-url="cour.xml" kerning="yes" embed-url="cour.ttf">
+				<font-triplet name="Courier New" style="normal" weight="normal"/>
+				<font-triplet name="Courier New Cyr" style="normal" weight="normal"/>
+			</font>
+			<font metrics-url="courbd.xml" kerning="yes" embed-url="courbd.ttf">
+				<font-triplet name="Courier New" style="normal" weight="bold"/>
+				<font-triplet name="Courier New Cyr" style="normal" weight="bold"/>
+			</font>
+			<font metrics-url="couri.xml" kerning="yes" embed-url="couri.ttf">
+				<font-triplet name="Courier New" style="italic" weight="normal"/>
+				<font-triplet name="Courier New Cyr" style="italic" weight="normal"/>
+			</font>
+			<font metrics-url="courbi.xml" kerning="yes" embed-url="courbi.ttf">
+				<font-triplet name="Courier New" style="italic" weight="bold"/>
+				<font-triplet name="Courier New Cyr" style="italic" weight="bold"/>
+			</font>
+			
+			<font metrics-url="Posti_nr.xml" kerning="yes" embed-url="Posti_nr.ttf">
+				<font-triplet name="PostIndex" style="normal" weight="normal"/>
+				<font-triplet name="PostIndex" style="normal" weight="bold"/>
+				<font-triplet name="PostIndex" style="italic" weight="normal"/>
+				<font-triplet name="PostIndex" style="italic" weight="bold"/>
+			</font>
+			
+			<font metrics-url="IntP36DlTt.xml" kerning="yes" embed-url="IntP36DlTt.ttf">
+				<font-triplet name="IntP36DlTt" style="normal" weight="normal"/>
+				<font-triplet name="IntP36DlTt" style="normal" weight="bold"/>
+				<font-triplet name="IntP36DlTt" style="italic" weight="normal"/>
+				<font-triplet name="IntP36DlTt" style="italic" weight="bold"/>
+			</font>
+			
+			<font metrics-url="C39HrP24DmTt.xml" kerning="yes" embed-url="C39HrP24DmTt.ttf">
+				<font-triplet name="C39HrP24DmTt" style="normal" weight="normal"/>
+				<font-triplet name="C39HrP24DmTt" style="normal" weight="bold"/>
+				<font-triplet name="C39HrP24DmTt" style="italic" weight="normal"/>
+				<font-triplet name="C39HrP24DmTt" style="italic" weight="bold"/>
+			</font>
+		        
+		</fonts>
+    </renderer>
 
   </renderers>
 
