@@ -38,6 +38,7 @@ import org.xml.sax.SAXException;
 
 import ru.aplix.converters.fr2afop.reader.InputStreamOpener;
 import ru.aplix.converters.fr2afop.utils.Utils;
+import ru.aplix.converters.fr2afop.writer.OutputStreamOpener;
 
 public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOutput {
 
@@ -49,6 +50,7 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 	private String outputFormat;
 	private String configFileName;
 	private InputStreamOpener inputStreamOpener;
+	private OutputStreamOpener outputStreamOpener;
 
 	private static FopFactory fopFactory = null;
 	private static Templates cachedXSLT = null;
@@ -93,7 +95,7 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 
 		log.info("Rendering file...");
 		log.info(String.format("  source: \"%s\"", inputStreamOpener == null ? getInputFileName() : "memory buffer"));
-		log.info(String.format("  output: \"%s\"", getOutputFileName()));
+		log.info(String.format("  output: \"%s\"", outputStreamOpener == null ? getOutputFileName() : "memory buffer"));
 		log.info(String.format("  format: \"%s\"", outputFormat));
 		log.info(String.format("  configuration: \"%s\"", configFile.getAbsolutePath()));
 		log.info("");
@@ -114,7 +116,11 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 		// Setup output
 		OutputStream out = null;
 		if (!MimeConstants.MIME_FOP_PRINT.equals(outputFormat)) {
-			out = new BufferedOutputStream(new FileOutputStream(getOutputFileName()));
+			if (outputStreamOpener == null) {
+				out = new BufferedOutputStream(new FileOutputStream(getOutputFileName()));
+			} else {
+				out = new BufferedOutputStream(outputStreamOpener.openStream());
+			}
 		}
 
 		try {
@@ -184,6 +190,10 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 
 	public void setInputStreamOpener(InputStreamOpener inputStreamOpener) {
 		this.inputStreamOpener = inputStreamOpener;
+	}
+	
+	public void setOutputStreamOpener(OutputStreamOpener outputStreamOpener) {
+		this.outputStreamOpener = outputStreamOpener;
 	}
 
 	@Override
