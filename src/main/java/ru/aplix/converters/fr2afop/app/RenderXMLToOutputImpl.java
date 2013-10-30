@@ -33,7 +33,7 @@ import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.fop.render.PrintRendererConfigurator;
-import org.apache.fop.render.print.PrintRenderer;
+import org.apache.fop.render.print.PageableRenderer;
 import org.xml.sax.SAXException;
 
 import ru.aplix.converters.fr2afop.reader.InputStreamOpener;
@@ -146,7 +146,7 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 
 				if (MimeConstants.MIME_FOP_PRINT.equals(outputFormat)) {
 					// Create print renderer
-					PrintRenderer renderer = new PrintRenderer(userAgent);
+					PageableRenderer renderer = new PageableRenderer(userAgent);
 					PrintRendererConfigurator.createDefaultInstance(userAgent).configure(renderer);
 					userAgent.setRendererOverride(renderer);
 
@@ -191,7 +191,7 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 	public void setInputStreamOpener(InputStreamOpener inputStreamOpener) {
 		this.inputStreamOpener = inputStreamOpener;
 	}
-	
+
 	public void setOutputStreamOpener(OutputStreamOpener outputStreamOpener) {
 		this.outputStreamOpener = outputStreamOpener;
 	}
