@@ -774,7 +774,21 @@
 			<fo:block font-size="0" text-align="center">
 				<fo:instream-foreign-object>
 					<barcode:barcode>
-						<xsl:attribute name="message"><xsl:value-of select="fn:normalize-space($message)" /></xsl:attribute>
+						<xsl:choose>
+							<xsl:when test="@BarCodeType = 'datamatrix'">
+								<xsl:attribute name="message">
+									<xsl:text>url(data:;base64,</xsl:text>
+									<xsl:value-of select="utils:base64($message, @DataMatrixEncoding)" xmlns:utils="java:ru.aplix.converters.fr2afop.utils.Utils" />
+									<xsl:text>)</xsl:text>
+								</xsl:attribute>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:attribute name="message"><xsl:value-of select="fn:normalize-space($message)" /></xsl:attribute>
+							</xsl:otherwise>
+						</xsl:choose>
+
+						<xsl:attribute name="sasa"><xsl:value-of select="@DataMatrixEncoding" /></xsl:attribute>
+
 						<xsl:attribute name="orientation"><xsl:value-of select="attribute::Angle" /></xsl:attribute>
 
 						<xsl:element name="{concat('barcode:', @BarCodeType)}">

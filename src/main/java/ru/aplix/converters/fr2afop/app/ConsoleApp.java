@@ -56,7 +56,7 @@ public class ConsoleApp {
 				command.execute();
 			}
 		} catch (Exception e) {
-			log.error(e);
+			log.error(null, e);
 		}
 	}
 

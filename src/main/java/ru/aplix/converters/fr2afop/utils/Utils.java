@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.commons.codec.binary.Base64;
 import org.xml.sax.InputSource;
 
 /**
@@ -151,5 +153,20 @@ public final class Utils {
 			}
 		}
 		return o;
+	}
+
+	/**
+	 * Encodes text in base64 format.
+	 * 
+	 * @param text
+	 *            text to encode
+	 * @param encoding
+	 *            the named charset to encode this text into a sequence of bytes
+	 * @return String containing Base64 characters.
+	 * @throws UnsupportedEncodingException
+	 *             If the named charset is not supported
+	 */
+	public static String base64(String text, String encoding) throws UnsupportedEncodingException {
+		return Base64.encodeBase64String(text.getBytes(encoding));
 	}
 }
