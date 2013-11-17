@@ -21,6 +21,8 @@ public class BarCodeView extends View {
 	private int angle;
 	@XmlAttribute(name = "DataMatrixEncoding")
 	private String dataMatrixEncoding;
+	@XmlAttribute(name = "ModuleWidth")
+	private String moduleWidth;
 
 	public boolean isCheckSum() {
 		return checkSum;
@@ -60,5 +62,13 @@ public class BarCodeView extends View {
 
 	public void setDataMatrixEncoding(String dataMatrixEncoding) {
 		this.dataMatrixEncoding = dataMatrixEncoding;
+	}
+
+	public String getModuleWidth() {
+		return moduleWidth;
+	}
+
+	public void setModuleWidth(String moduleWidth) {
+		this.moduleWidth = moduleWidth;
 	}
 }

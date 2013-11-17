@@ -258,7 +258,7 @@ public class Functions extends AbstractFunctions {
 			index--;
 			return ((String) o).substring(index, index + count);
 		} catch (IndexOutOfBoundsException ioobe) {
-			return (String) o;
+			return "";
 		}
 	}
 

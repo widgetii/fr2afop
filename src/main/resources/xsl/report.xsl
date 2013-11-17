@@ -787,8 +787,6 @@
 							</xsl:otherwise>
 						</xsl:choose>
 
-						<xsl:attribute name="sasa"><xsl:value-of select="@DataMatrixEncoding" /></xsl:attribute>
-
 						<xsl:attribute name="orientation"><xsl:value-of select="attribute::Angle" /></xsl:attribute>
 
 						<xsl:element name="{concat('barcode:', @BarCodeType)}">
@@ -823,6 +821,12 @@
 									<barcode:checksum>auto</barcode:checksum>
 								</xsl:otherwise>
 							</xsl:choose>
+
+							<xsl:if test="@BarCodeType = 'datamatrix'">
+								<barcode:module-width>
+									<xsl:value-of select="concat(@ModuleWidth, 'mm')" />
+								</barcode:module-width>
+							</xsl:if>
 
 						</xsl:element>
 					</barcode:barcode>
