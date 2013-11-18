@@ -14,6 +14,7 @@ import javax.print.PrintException;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.print.SimpleDoc;
+import javax.print.attribute.PrintRequestAttributeSet;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
@@ -37,6 +38,7 @@ import org.apache.fop.render.print.PageableRenderer;
 import org.xml.sax.SAXException;
 
 import ru.aplix.converters.fr2afop.reader.InputStreamOpener;
+import ru.aplix.converters.fr2afop.utils.PrintAttributesResolver;
 import ru.aplix.converters.fr2afop.utils.Utils;
 import ru.aplix.converters.fr2afop.writer.OutputStreamOpener;
 
@@ -51,6 +53,7 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 	private String configFileName;
 	private InputStreamOpener inputStreamOpener;
 	private OutputStreamOpener outputStreamOpener;
+	private PrintAttributesResolver printAttributesResolver;
 
 	private static FopFactory fopFactory = null;
 	private static Templates cachedXSLT = null;
@@ -165,10 +168,8 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 				transformer.transform(src, res);
 
 				if (MimeConstants.MIME_FOP_PRINT.equals(outputFormat)) {
-					// Set up DocPrintJob instance
-					DocPrintJob printJob = createDocPrintJob();
 					Doc doc = new SimpleDoc(userAgent.getRendererOverride(), DocFlavor.SERVICE_FORMATTED.PAGEABLE, null);
-					printJob.print(doc, null);
+					printIt(doc);
 				}
 			}
 		} finally {
@@ -196,6 +197,10 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 		this.outputStreamOpener = outputStreamOpener;
 	}
 
+	public void setPrintAttributesResolver(PrintAttributesResolver printAttributesResolver) {
+		this.printAttributesResolver = printAttributesResolver;
+	}
+
 	@Override
 	public void copy(Command dest) {
 		super.copy(dest);
@@ -207,20 +212,30 @@ public class RenderXMLToOutputImpl extends CommandImpl implements RenderXMLToOut
 		}
 	}
 
-	private DocPrintJob createDocPrintJob() throws PrintException {
+	private void printIt(Doc doc) throws PrintException {
+		PrintService printService = findPrintSerrvice(getOutputFileName());
+		if (printService == null) {
+			throw new PrintException(String.format("Printer \"%s\" not found.", getOutputFileName()));
+		}
+
+		// Set up DocPrintJob instance
+		DocPrintJob printJob = printService.createPrintJob();
+		PrintRequestAttributeSet attributes = null;
+		if (printAttributesResolver != null) {
+			attributes = printAttributesResolver.createPrintAttributes(printService);
+		}
+		printJob.print(doc, attributes);
+	}
+
+	private PrintService findPrintSerrvice(String name) {
 		PrintService[] services = PrintServiceLookup.lookupPrintServices(DocFlavor.SERVICE_FORMATTED.PAGEABLE, null);
 
 		PrintService printService = null;
 		for (PrintService service : services) {
-			if (getOutputFileName().equalsIgnoreCase(service.getName())) {
+			if (service.getName().equalsIgnoreCase(name)) {
 				printService = service;
 			}
 		}
-
-		if (printService != null) {
-			return printService.createPrintJob();
-		} else {
-			throw new PrintException(String.format("Printer \"%s\" not found.", getOutputFileName()));
-		}
+		return printService;
 	}
 }
