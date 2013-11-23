@@ -55,7 +55,7 @@ public class VariableValue extends Number {
 	@Override
 	public int intValue() {
 		try {
-			return Integer.parseInt(value);
+			return Double.valueOf(value).intValue();
 		} catch (NumberFormatException npe) {
 			return 0;
 		}
@@ -64,7 +64,7 @@ public class VariableValue extends Number {
 	@Override
 	public long longValue() {
 		try {
-			return Long.parseLong(value);
+			return Double.valueOf(value).longValue();
 		} catch (NumberFormatException npe) {
 			return 0L;
 		}
@@ -73,7 +73,7 @@ public class VariableValue extends Number {
 	@Override
 	public float floatValue() {
 		try {
-			return Float.parseFloat(value);
+			return Double.valueOf(value).floatValue();
 		} catch (NumberFormatException npe) {
 			return Float.NaN;
 		}
@@ -82,7 +82,7 @@ public class VariableValue extends Number {
 	@Override
 	public double doubleValue() {
 		try {
-			return Double.parseDouble(value);
+			return Double.valueOf(value);
 		} catch (NumberFormatException npe) {
 			return Double.NaN;
 		}
