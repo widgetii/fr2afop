@@ -822,7 +822,7 @@
 								</xsl:otherwise>
 							</xsl:choose>
 
-							<xsl:if test="@BarCodeType = 'datamatrix'">
+							<xsl:if test="@ModuleWidth != ''">
 								<barcode:module-width>
 									<xsl:value-of select="concat(@ModuleWidth, 'mm')" />
 								</barcode:module-width>

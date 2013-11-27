@@ -167,6 +167,6 @@ public final class Utils {
 	 *             If the named charset is not supported
 	 */
 	public static String base64(String text, String encoding) throws UnsupportedEncodingException {
-		return Base64.encodeBase64String(text.getBytes(encoding));
+		return Base64.encodeBase64String(encoding != null ? text.getBytes(encoding) : text.getBytes());
 	}
 }

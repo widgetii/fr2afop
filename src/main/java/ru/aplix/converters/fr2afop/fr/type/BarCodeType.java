@@ -51,5 +51,8 @@ public enum BarCodeType {
 	BCD_EAN8,
 
 	@XmlEnumValue("ean-13")
-	BCD_EAN13
+	BCD_EAN13,
+
+	@XmlEnumValue("qr")
+	BCD_QR
 }
