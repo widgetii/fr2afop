@@ -1,35 +1,34 @@
 package ru.aplix.converters.fr2afop.fr.image;
 
-import java.awt.Image;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import ru.aplix.converters.fr2afop.fr.type.MimeType;
+import ru.aplix.converters.fr2afop.utils.CDATAStringAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "BMPImage")
-public class BMPImage extends AbstractImage<Image> {
+@XmlRootElement(name = "SVGImage")
+public class SVGImage extends AbstractImage<String> {
 
+	@XmlJavaTypeAdapter(CDATAStringAdapter.class)
 	@XmlElement(name = "Content")
-	@XmlMimeType(value = "image/bmp")
-	private Image image;
+	private String image;
 
 	@Override
-	public Image getImage() {
+	public String getImage() {
 		return image;
 	}
 
 	@Override
-	public void setImage(Image image) {
+	public void setImage(String image) {
 		this.image = image;
 	}
 
 	@Override
 	public MimeType getMimeType() {
-		return MimeType.BMP;
+		return MimeType.SVG;
 	}
 }

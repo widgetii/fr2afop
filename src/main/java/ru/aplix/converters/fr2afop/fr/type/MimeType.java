@@ -16,4 +16,7 @@ public enum MimeType {
 
 	@XmlEnumValue("image/x-emf")
 	EMF,
+
+	@XmlEnumValue("image/svg+xml")
+	SVG
 }

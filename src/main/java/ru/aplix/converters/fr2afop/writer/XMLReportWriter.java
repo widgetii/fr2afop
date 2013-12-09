@@ -2,6 +2,7 @@ package ru.aplix.converters.fr2afop.writer;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
@@ -15,6 +16,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import ru.aplix.converters.fr2afop.fr.Report;
+
+import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
 
 public class XMLReportWriter implements ReportWriter {
 
@@ -36,6 +39,12 @@ public class XMLReportWriter implements ReportWriter {
 			Marshaller marshaller = inst.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+			marshaller.setProperty(CharacterEscapeHandler.class.getName(), new CharacterEscapeHandler() {
+				@Override
+				public void escape(char[] ch, int start, int length, boolean isAttVal, Writer writer) throws IOException {
+					writer.write(ch, start, length);
+				}
+			});
 
 			if (xsltFile != null) {
 				Source xslt = new StreamSource(xsltFile);

@@ -926,12 +926,20 @@
 
 					<!-- Image Source -->
 					<xsl:attribute name="src">
-							<xsl:text>url('data:</xsl:text>
-							<xsl:value-of select="*/@Mime" /> 
-							<xsl:text>;base64,</xsl:text>
-							<xsl:value-of select="*/Content" />
-							<xsl:text>')</xsl:text>
-						</xsl:attribute>
+						<xsl:text>url('data:</xsl:text>
+						<xsl:value-of select="*/@Mime" />
+						<xsl:text>;base64,</xsl:text>
+
+						<xsl:choose>
+							<xsl:when test="*/@Mime = 'image/svg+xml'">
+								<xsl:value-of select="utils:base64(*/Content, UTF-8)" xmlns:utils="java:ru.aplix.converters.fr2afop.utils.Utils" />
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="*/Content" />
+							</xsl:otherwise>
+						</xsl:choose>
+						<xsl:text>')</xsl:text>
+					</xsl:attribute>
 				</fo:external-graphic>
 			</fo:block>
 		</xsl:if>

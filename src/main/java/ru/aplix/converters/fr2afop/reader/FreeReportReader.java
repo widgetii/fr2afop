@@ -1,6 +1,7 @@
 package ru.aplix.converters.fr2afop.reader;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
@@ -270,6 +271,8 @@ public class FreeReportReader implements ReportReader {
 		page.setSize(dis.readInt());
 		page.setWidth(dis.readInt() / 10f); // page width in mm
 		page.setHeight(dis.readInt() / 10f); // page height in mm
+		//page.setWidth(210f);
+		//page.setHeight(148f);
 
 		int[] pr = printerResolution.getResolution(PrinterResolution.DPI);
 		float pageWidthInPixels = page.getWidth() / 25.4f * (float) pr[0];
@@ -812,7 +815,7 @@ public class FreeReportReader implements ReportReader {
 		view.setCentered((view.getFlags() & ViewFlag.PictCenter) == ViewFlag.PictCenter);
 		view.setKeepRatio((view.getFlags() & ViewFlag.PictRatio) == ViewFlag.PictRatio);
 
-		AbstractImage image = null;
+		AbstractImage<Image> image = null;
 
 		int pictureType = dis.readUnsignedByte();
 		switch (pictureType) {

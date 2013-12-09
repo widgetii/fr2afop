@@ -12,7 +12,7 @@ import ru.aplix.converters.fr2afop.fr.type.MimeType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "JPEGImage")
-public class JPEGImage extends AbstractImage {
+public class JPEGImage extends AbstractImage<Image> {
 
 	@XmlElement(name = "Content")
 	@XmlMimeType(value = "image/jpeg")
