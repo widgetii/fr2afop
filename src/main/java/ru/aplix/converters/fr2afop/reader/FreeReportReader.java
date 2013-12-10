@@ -271,8 +271,6 @@ public class FreeReportReader implements ReportReader {
 		page.setSize(dis.readInt());
 		page.setWidth(dis.readInt() / 10f); // page width in mm
 		page.setHeight(dis.readInt() / 10f); // page height in mm
-		//page.setWidth(210f);
-		//page.setHeight(148f);
 
 		int[] pr = printerResolution.getResolution(PrinterResolution.DPI);
 		float pageWidthInPixels = page.getWidth() / 25.4f * (float) pr[0];
