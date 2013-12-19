@@ -1,5 +1,12 @@
 package ru.aplix.converters.fr2afop.database;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -299,6 +306,25 @@ public class Functions extends AbstractFunctions {
 		if (text.length() > 0) {
 			return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
 		} else {
+			return text;
+		}
+	}
+
+	public String formatDate(Object o, String pattern) {
+		o = Utils.unarray(o);
+		if (o instanceof VariableValue) {
+			VariableValue vv = ((VariableValue) o);
+			o = vv.getValue();
+		}
+
+		String text = (String) o;
+		try {
+			XMLGregorianCalendar xmlGC = DatatypeFactory.newInstance().newXMLGregorianCalendar(text);
+			DateFormat df = new SimpleDateFormat(pattern);
+			Date d = xmlGC.toGregorianCalendar().getTime();
+			return df.format(d);
+		} catch (Exception e) {
+			log.warn(String.format("Can't format a string '%s' into a date with a pattern '%s'", text, pattern));
 			return text;
 		}
 	}

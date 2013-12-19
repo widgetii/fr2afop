@@ -77,7 +77,7 @@
 			<xsl:apply-templates select="@*" />
 
 			<xsl:attribute name="CheckSum">true</xsl:attribute>
-			<xsl:attribute name="ShowText">true</xsl:attribute>
+			<xsl:attribute name="ShowText">false</xsl:attribute>
 			<xsl:attribute name="Angle">0</xsl:attribute>
 
 			<xsl:choose>
