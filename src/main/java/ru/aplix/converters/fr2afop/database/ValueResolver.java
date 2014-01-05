@@ -18,6 +18,7 @@ import org.apache.commons.collections.Predicate;
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.JexlException;
 import org.apache.commons.jexl2.MapContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -244,8 +245,10 @@ public class ValueResolver {
 					con.close();
 				}
 			}
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			log.warn(String.format("Error fetching data from '%s'", dataset.getName()), e);
+		} catch (ClassNotFoundException cnfe) {
+			throw new RuntimeException(cnfe);
 		}
 		log.info(String.format("Fetched %d records", count));
 	}
@@ -420,7 +423,9 @@ public class ValueResolver {
 			// work it out
 			Expression e = jexl.createExpression(expression);
 			result = e.evaluate(context);
-		} catch (Exception exception) {
+		} catch (JexlException exception) {
+			log.warn(String.format("Can't evaluate the expression '%s'", expression), exception);
+		} catch (NumberFormatException exception) {
 			log.warn(String.format("Can't evaluate the expression '%s'", expression), exception);
 		}
 
