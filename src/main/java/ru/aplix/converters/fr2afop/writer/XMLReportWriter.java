@@ -2,22 +2,24 @@ package ru.aplix.converters.fr2afop.writer;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.util.JAXBSource;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import ru.aplix.converters.fr2afop.fr.Report;
+import org.apache.commons.lang.CharEncoding;
+import org.w3c.dom.Document;
 
-import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
+import ru.aplix.converters.fr2afop.fr.Report;
 
 public class XMLReportWriter implements ReportWriter {
 
@@ -32,30 +34,28 @@ public class XMLReportWriter implements ReportWriter {
 
 	@Override
 	public void writeToStream(Report report, OutputStreamOpener so) throws Exception {
-		Writer out = new BufferedWriter(new OutputStreamWriter(so.openStream(), "UTF-8"));
+		Writer out = new BufferedWriter(new OutputStreamWriter(so.openStream(), CharEncoding.UTF_8));
 		try {
+			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+			Document document = docBuilderFactory.newDocumentBuilder().newDocument();
+
 			JAXBContext inst = JAXBContext.newInstance(Report.class);
-
 			Marshaller marshaller = inst.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-			marshaller.setProperty(CharacterEscapeHandler.class.getName(), new CharacterEscapeHandler() {
-				@Override
-				public void escape(char[] ch, int start, int length, boolean isAttVal, Writer writer) throws IOException {
-					writer.write(ch, start, length);
-				}
-			});
+			marshaller.marshal(report, document);
 
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer;
 			if (xsltFile != null) {
 				Source xslt = new StreamSource(xsltFile);
-				TransformerFactory factory = TransformerFactory.newInstance();
-				Transformer transformer = factory.newTransformer(xslt);
-
-				JAXBSource source = new JAXBSource(marshaller, report);
-				transformer.transform(source, new StreamResult(out));
+				transformer = transformerFactory.newTransformer(xslt);
 			} else {
-				marshaller.marshal(report, out);
+				transformer = transformerFactory.newTransformer();
+				transformer.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, "Content");
+				transformer.setOutputProperty(OutputKeys.ENCODING, CharEncoding.UTF_8);
+				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			}
+
+			transformer.transform(new DOMSource(document), new StreamResult(out));
 
 			out.flush();
 		} finally {
