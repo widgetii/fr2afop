@@ -25,7 +25,7 @@ public class MemoView extends View {
 	@XmlAttribute(name = "FontColor")
 	protected Color fontColor;
 	@XmlAttribute(name = "FontSize")
-	protected int fontSize;
+	protected float fontSize;
 	@XmlAttribute(name = "FontWeight")
 	protected FontWeight fontWeight;
 	@XmlAttribute(name = "FontStyle")
@@ -57,11 +57,11 @@ public class MemoView extends View {
 		this.fontColor = value;
 	}
 
-	public int getFontSize() {
+	public float getFontSize() {
 		return fontSize;
 	}
 
-	public void setFontSize(int value) {
+	public void setFontSize(float value) {
 		this.fontSize = value;
 	}
 
