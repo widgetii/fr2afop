@@ -963,11 +963,17 @@
 
 				<!-- Rotation, Width/Height -->
 				<xsl:choose>
-					<xsl:when test="attribute::Rotate = 'true'">
+					<xsl:when test="attribute::Rotate = '90'">
 						<xsl:attribute name="height"><xsl:value-of select="$viewable-area-width * @Width div 100" />mm</xsl:attribute>
 						<xsl:attribute name="width"><xsl:value-of select="$viewable-area-height * @Height div 100" />mm</xsl:attribute>
 
 						<xsl:attribute name="reference-orientation">90</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="attribute::Rotate = '270'">
+						<xsl:attribute name="height"><xsl:value-of select="$viewable-area-width * @Width div 100" />mm</xsl:attribute>
+						<xsl:attribute name="width"><xsl:value-of select="$viewable-area-height * @Height div 100" />mm</xsl:attribute>
+
+						<xsl:attribute name="reference-orientation">270</xsl:attribute>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:attribute name="width"><xsl:value-of select="$viewable-area-width * @Width div 100" />mm</xsl:attribute>
@@ -1006,7 +1012,7 @@
 				</xsl:choose>
 
 				<!-- Clipping Text -->
-				<xsl:if test="attribute::Rotate = 'false'">
+				<xsl:if test="attribute::Rotate = '0'">
 					<xsl:attribute name="overflow">hidden</xsl:attribute>
 				</xsl:if>
 

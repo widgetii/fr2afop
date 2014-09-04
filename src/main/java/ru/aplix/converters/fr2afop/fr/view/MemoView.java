@@ -37,8 +37,8 @@ public class MemoView extends View {
 	@XmlAttribute(name = "VerticalAlign")
 	protected VerticalAlign verticalAlign;
 	@XmlAttribute(name = "Rotate")
-	protected boolean rotate;
-	//@XmlElement(name = "Highlight", type = Highlight.class)
+	protected int rotate;
+	// @XmlElement(name = "Highlight", type = Highlight.class)
 	protected transient Highlight highlight;
 
 	public String getFontName() {
@@ -105,11 +105,11 @@ public class MemoView extends View {
 		this.verticalAlign = value;
 	}
 
-	public boolean getRotate() {
+	public int getRotate() {
 		return rotate;
 	}
 
-	public void setRotate(boolean value) {
+	public void setRotate(int value) {
 		this.rotate = value;
 	}
 

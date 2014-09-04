@@ -791,7 +791,7 @@ public class FreeReportReader implements ReportReader {
 		int adjust = dis.readInt();
 		view.setTextAlign(convertTextAlign(adjust));
 		view.setVerticalAlign(convertVerticalAlign(adjust));
-		view.setRotate(((adjust & 0x04) == 0x04));
+		view.setRotate(((adjust & 0x04) == 0x04) ? 90 : 0);
 
 		dis.readUnsignedShort(); // Font Charset
 
