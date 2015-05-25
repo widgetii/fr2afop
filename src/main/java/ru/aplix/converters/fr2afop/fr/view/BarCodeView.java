@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import ru.aplix.converters.fr2afop.fr.type.BarCodeType;
+import ru.aplix.converters.fr2afop.fr.type.TextAlign;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "BarCodeView")
@@ -23,6 +24,8 @@ public class BarCodeView extends View {
 	private String dataMatrixEncoding;
 	@XmlAttribute(name = "ModuleWidth")
 	private String moduleWidth;
+	@XmlAttribute(name = "Align")
+	protected TextAlign align;
 
 	public boolean isCheckSum() {
 		return checkSum;
@@ -71,4 +74,13 @@ public class BarCodeView extends View {
 	public void setModuleWidth(String moduleWidth) {
 		this.moduleWidth = moduleWidth;
 	}
+
+	public TextAlign getAlign() {
+		return align;
+	}
+
+	public void setAlign(TextAlign align) {
+		this.align = align;
+	}
+
 }

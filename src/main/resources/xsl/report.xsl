@@ -771,7 +771,18 @@
 			<xsl:attribute name="display-align">center</xsl:attribute>
 
 			<!-- BarCode -->
-			<fo:block font-size="0" text-align="center">
+			<fo:block font-size="0">
+				<xsl:attribute name="text-align">
+					<xsl:choose>
+						<xsl:when test="attribute::Align != ''">
+							<xsl:value-of select="attribute::Align" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="'center'" />
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+
 				<fo:instream-foreign-object>
 					<barcode:barcode>
 						<xsl:choose>
